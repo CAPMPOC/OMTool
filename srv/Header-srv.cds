@@ -238,6 +238,7 @@ annotate OMTSrv.EmployeeHeader with {
                 Common.Text                    : Accessibility.Description,
                 Common.Text.@UI.TextArrangement: #TextOnly,
                 Common.Label                   : 'Accessbility',
+                Common.ExternalID              : Accessibility.Description,
                 Common.ValueList               : {
                         $Type         : 'Common.ValueListType',
                         CollectionPath: 'AccessibilityVH',
@@ -247,11 +248,11 @@ annotate OMTSrv.EmployeeHeader with {
                                         LocalDataProperty: Accessibility_AccessID,
                                         ValueListProperty: 'AccessID',
                                 },
-                                {
-                                        $Type            : 'Common.ValueListParameterDisplayOnly',
-                                        LocalDataProperty: Accessibility_Description,
-                                        ValueListProperty: 'Description',
-                                },
+                                // {
+                                //         $Type            : 'Common.ValueListParameterDisplayOnly',
+                                //         LocalDataProperty: Accessibility_Description,
+                                //         ValueListProperty: 'Description',
+                                // },
                         ],
                 },
         )
