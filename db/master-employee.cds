@@ -13,11 +13,7 @@ entity EmployeeHeader {
         RollOnDate           : Date;
         Staff_RollOffStatus  : Boolean default false;
         RollOffDate          : Date;
-        Accessibility        : String(10) enum {
-            Fresher;
-            Junior;
-            Senior;
-        };
+        Accessibility        : Association to AccessibilityVH;
         NonSAP               : String(10);
         SAP                  : String(10);
         SAPToday             : String(10);
@@ -25,4 +21,9 @@ entity EmployeeHeader {
         Skill                : String(200);
         Staff_RollOffReasons : String(100);
         Staff_ReasonsRemarks : String(50);
+}
+
+entity AccessibilityVH {
+    key AccessID    : String(10) @Common.Label: 'Accessbility ID';
+        Description : String(30) @Common.Label: 'Description';
 }
