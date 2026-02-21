@@ -6,8 +6,11 @@ service OMTSrv {
 
         entity AccessibilityVH as projection on empheader.AccessibilityVH;
         entity LocationVH      as projection on empheader.LocationVH;
+        entity RollOffImpactVH as projection on empheader.RollofImpactVH;
+        entity SkillVH         as projection on empheader.SkillVH;
 }
 
+//Design level annotation
 annotate OMTSrv.EmployeeHeader with @(UI: {
         SelectionFields       : [
                 Accessibility_AccessID,
@@ -20,9 +23,6 @@ annotate OMTSrv.EmployeeHeader with @(UI: {
                 Title         : {$value: {Empid}},
                 Description   : {$value: {Empid}},
         },
-        Identification        : [
-
-        ],
         LineItem              : [
                 {
                         $Type: 'UI.DataField',
@@ -90,6 +90,7 @@ annotate OMTSrv.EmployeeHeader with @(UI: {
                         Label: 'Total Experience',
                 },
         ],
+        //Facets
         FieldGroup #BasicInfo : {
                 $Type: 'UI.FieldGroupType',
                 Data : [
@@ -121,6 +122,7 @@ annotate OMTSrv.EmployeeHeader with @(UI: {
                         {
                                 $Type: 'UI.DataField',
                                 Value: ktStarted,
+                                // Common.FieldControl: {$Path: 'ktStartedFC'},
                                 Label: 'Has on-boarding KT begun'
                         },
                 ]
@@ -177,7 +179,7 @@ annotate OMTSrv.EmployeeHeader with @(UI: {
                         },
                         {
                                 $Type: 'UI.DataField',
-                                Value: Skill,
+                                Value: Skill_SkillID,
                                 Label: 'Employee Skills'
                         }
                 ]
@@ -189,21 +191,25 @@ annotate OMTSrv.EmployeeHeader with @(UI: {
                         {
                                 $Type: 'UI.DataField',
                                 Value: handoverKtBegun,
+                                // Common.FieldControl: {$Path: 'ktStartedFC'},
                                 Label: 'Has Handover KT begun?'
                         },
                         {
                                 $Type: 'UI.DataField',
                                 Value: Staff_RollOffStatus,
+                                // Common.FieldControl: {$Path: 'rollOffFC'},
                                 Label: 'Employee Roll-off Status'
                         },
                         {
                                 $Type: 'UI.DataField',
                                 Value: Staff_RollOffReasons,
+                                // Common.FieldControl: {$Path: 'rollOffFC'},
                                 Label: 'Employee Roll-off Reason'
                         },
                         {
                                 $Type: 'UI.DataField',
                                 Value: Staff_ReasonsRemarks,
+                                // Common.FieldControl: {$Path: 'rollOffFC'},
                                 Label: 'Reasons/Remarks'
                         },
                         {
@@ -214,11 +220,13 @@ annotate OMTSrv.EmployeeHeader with @(UI: {
                         {
                                 $Type: 'UI.DataField',
                                 Value: RollOffDate,
+                                // @Common.FieldControl: {$Path: 'rollOffFC'},
                                 Label: 'Roll-Off Date'
                         },
                         {
                                 $Type: 'UI.DataField',
-                                Value: RollOffImpact,
+                                Value: RollOffImpact_ROI,
+                                // Common.FieldControl: {$Path: 'rollOffFC'},
                                 Label: 'Impact of Roll Off'
                         }
                 ]
@@ -247,28 +255,66 @@ annotate OMTSrv.EmployeeHeader with @(UI: {
         ],
 }, ) {
         // Keep your existing LineItem or adjust labels here
-        RollOffDate          @Common.Label: 'Roll-Off Date';
-        RollOffImpact        @Common.Label: 'Impact of Roll Off';
+        Empid                @mandatory;
+        CID                  @mandatory;
+        FirstName            @mandatory;
+        LastName             @mandatory;
+        RollOffDate          @(
+                Common.Label       : 'Roll-Off Date',
+                Common.FieldControl: 'rollOffFC'
+        );
+        // Association field control (for value help field)
+        RollOffImpact        @(
+                Common.Label       : 'Impact of Roll Off',
+                Common.FieldControl: 'rollOffFC'
+        );
+        // // Optional safety: in case UI binds to the generated FK field
+        // RollOffImpact_ROI    @(Common.FieldControl: {$Path: 'rollOffFC'});
         RollOnDate           @Common.Label: 'Roll-on Date';
         Skill                @Common.Label: 'Employee Skills';
-        Staff_ReasonsRemarks @Common.Label: 'Reasons/Remarks';
-        Staff_RollOffReasons @Common.Label: 'Employee Roll-off Reason';
-        Staff_RollOffStatus  @Common.Label: 'Employee Roll-off Status';
-        handoverKtBegun      @Common.Label: 'Has Handover KT begun?';
-        ktStarted            @Common.Label: 'Has on-boarding KT begun?';
+        // Roll-off related fields are read-only while ktStarted=true (computed by srv handler)
+        Staff_ReasonsRemarks @(
+                Common.Label       : 'Reasons/Remarks',
+                Common.FieldControl: 'rollOffFC'
+        );
+        Staff_RollOffReasons @(
+                Common.Label       : 'Employee Roll-off Reason',
+                Common.FieldControl: 'rollOffFC'
+        );
+        Staff_RollOffStatus  @(
+                Common.Label       : 'Employee Roll-off Status',
+                Common.FieldControl: 'rollOffFC'
+        );
+        handoverKtBegun      @(
+                Common.Label       : 'Has Handover KT begun?',
+                Common.FieldControl: 'rollOffFC'
+        );
+        // Hide ktStarted after 3 months, editable otherwise (computed by srv handler)
+        ktStarted            @(
+                Common.Label       : 'Has on-boarding KT begun?',
+                Common.FieldControl: 'ktStartedFC'
+        );
         ID                   @(
                 UI.Hidden          : true,
-                Common.FieldControl: #Hidden
+                Common.FieldControl: #Hidden,
+                Common.Label       : 'GUID'
         );
 };
 
+// Hide helper fields from UI
+annotate OMTSrv.EmployeeHeader with {
+        ktStartedFC @UI.Hidden: true;
+        rollOffFC   @UI.Hidden: true;
+};
+
+
+//Value Help mapping Annotation
 annotate OMTSrv.EmployeeHeader with {
         Accessibility @(
                 Common.ValueListWithFixedValues: true,
                 Common.Text                    : Accessibility.Description,
                 Common.Text.@UI.TextArrangement: #TextOnly,
                 Common.Label                   : 'Position',
-                Common.ExternalID              : Accessibility.Description,
                 Common.ValueList               : {
                         $Type         : 'Common.ValueListType',
                         CollectionPath: 'AccessibilityVH',
@@ -276,13 +322,7 @@ annotate OMTSrv.EmployeeHeader with {
                                 $Type            : 'Common.ValueListParameterInOut',
                                 LocalDataProperty: Accessibility_AccessID,
                                 ValueListProperty: 'AccessID',
-                        },
-                        // {
-                        //         $Type            : 'Common.ValueListParameterDisplayOnly',
-                        //         LocalDataProperty: Accessibility_Description,
-                        //         ValueListProperty: 'Description',
-                        // },
-                        ],
+                        }],
                 },
         );
         Location      @(
@@ -290,21 +330,44 @@ annotate OMTSrv.EmployeeHeader with {
                 Common.Text                    : Location.LocDesc,
                 Common.Text.@UI.TextArrangement: #TextOnly,
                 Common.Label                   : 'Employee Location',
-                Common.ExternalID              : Location.LocDesc,
                 Common.ValueList               : {
                         $Type         : 'Common.ValueListType',
                         CollectionPath: 'LocationVH',
+                        Parameters    : [
+                                {
+                                        $Type            : 'Common.ValueListParameterInOut',
+                                        LocalDataProperty: Location_LocID,
+                                        ValueListProperty: 'LocID',
+                                },
+                                {
+                                        $Type            : 'Common.ValueListParameterDisplayOnly',
+                                        ValueListProperty: 'LocDesc',
+                                }
+                        ],
+                },
+        );
+        RollOffImpact @(
+                Common.ValueListWithFixedValues: true,
+                Common.ValueList               : {
+                        $Type         : 'Common.ValueListType',
+                        CollectionPath: 'RollOffImpactVH',
                         Parameters    : [{
                                 $Type            : 'Common.ValueListParameterInOut',
-                                LocalDataProperty: Location_LocID,
-                                ValueListProperty: 'LocID',
-                        }
-                        // {
-                        //         $Type            : 'Common.ValueListParameterOut',
-                        //         LocalDataProperty: Location_LocDesc,
-                        //         ValueListProperty: 'LocDesc',
-                        // }
-                        ]
-                }
+                                LocalDataProperty: RollOffImpact_ROI,
+                                ValueListProperty: 'ROI',
+                        }],
+                },
         )
 };
+
+//Value Help Entity Annotation
+annotate OMTSrv.AccessibilityVH with {
+        AccessID @(
+                Common.Text                    : Description,
+                Common.Text.@UI.TextArrangement: #TextOnly
+        )
+}
+
+annotate OMTSrv.LocationVH with {
+        LocID @(Common.Text: LocDesc)
+}
