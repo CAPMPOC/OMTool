@@ -191,25 +191,21 @@ annotate OMTSrv.EmployeeHeader with @(UI: {
                         {
                                 $Type: 'UI.DataField',
                                 Value: handoverKtBegun,
-                                // Common.FieldControl: {$Path: 'ktStartedFC'},
                                 Label: 'Has Handover KT begun?'
                         },
                         {
                                 $Type: 'UI.DataField',
                                 Value: Staff_RollOffStatus,
-                                // Common.FieldControl: {$Path: 'rollOffFC'},
                                 Label: 'Employee Roll-off Status'
                         },
                         {
                                 $Type: 'UI.DataField',
                                 Value: Staff_RollOffReasons,
-                                // Common.FieldControl: {$Path: 'rollOffFC'},
                                 Label: 'Employee Roll-off Reason'
                         },
                         {
                                 $Type: 'UI.DataField',
                                 Value: Staff_ReasonsRemarks,
-                                // Common.FieldControl: {$Path: 'rollOffFC'},
                                 Label: 'Reasons/Remarks'
                         },
                         {
@@ -220,13 +216,11 @@ annotate OMTSrv.EmployeeHeader with @(UI: {
                         {
                                 $Type: 'UI.DataField',
                                 Value: RollOffDate,
-                                // @Common.FieldControl: {$Path: 'rollOffFC'},
                                 Label: 'Roll-Off Date'
                         },
                         {
                                 $Type: 'UI.DataField',
                                 Value: RollOffImpact_ROI,
-                                // Common.FieldControl: {$Path: 'rollOffFC'},
                                 Label: 'Impact of Roll Off'
                         }
                 ]
@@ -259,41 +253,15 @@ annotate OMTSrv.EmployeeHeader with @(UI: {
         CID                  @mandatory;
         FirstName            @mandatory;
         LastName             @mandatory;
-        RollOffDate          @(
-                Common.Label       : 'Roll-Off Date',
-                Common.FieldControl: 'rollOffFC'
-        );
-        // Association field control (for value help field)
-        RollOffImpact        @(
-                Common.Label       : 'Impact of Roll Off',
-                Common.FieldControl: 'rollOffFC'
-        );
-        // // Optional safety: in case UI binds to the generated FK field
-        // RollOffImpact_ROI    @(Common.FieldControl: {$Path: 'rollOffFC'});
+        RollOffDate          @Common.Label: 'Roll-Off Date';
+        RollOffImpact        @Common.Label: 'Impact of Roll Off';
         RollOnDate           @Common.Label: 'Roll-on Date';
         Skill                @Common.Label: 'Employee Skills';
-        // Roll-off related fields are read-only while ktStarted=true (computed by srv handler)
-        Staff_ReasonsRemarks @(
-                Common.Label       : 'Reasons/Remarks',
-                Common.FieldControl: 'rollOffFC'
-        );
-        Staff_RollOffReasons @(
-                Common.Label       : 'Employee Roll-off Reason',
-                Common.FieldControl: 'rollOffFC'
-        );
-        Staff_RollOffStatus  @(
-                Common.Label       : 'Employee Roll-off Status',
-                Common.FieldControl: 'rollOffFC'
-        );
-        handoverKtBegun      @(
-                Common.Label       : 'Has Handover KT begun?',
-                Common.FieldControl: 'rollOffFC'
-        );
-        // Hide ktStarted after 3 months, editable otherwise (computed by srv handler)
-        ktStarted            @(
-                Common.Label       : 'Has on-boarding KT begun?',
-                Common.FieldControl: 'ktStartedFC'
-        );
+        Staff_ReasonsRemarks @Common.Label: 'Reasons/Remarks';
+        Staff_RollOffReasons @Common.Label: 'Employee Roll-off Reason';
+        Staff_RollOffStatus  @Common.Label: 'Employee Roll-off Status';
+        handoverKtBegun      @Common.Label: 'Has Handover KT begun?';
+        ktStarted            @Common.Label: 'Has on-boarding KT begun?';
         ID                   @(
                 UI.Hidden          : true,
                 Common.FieldControl: #Hidden,
@@ -301,11 +269,99 @@ annotate OMTSrv.EmployeeHeader with @(UI: {
         );
 };
 
-// Hide helper fields from UI
+// // ==================== FIELD CONTROL ANNOTATIONS ====================
+
+// annotate OMTSrv.EmployeeHeader with {
+//         // RollOnDate: ReadOnly (1) on CREATE, Optional (3) on EDIT
+//         RollOnDate           @Common.FieldControl: {$edmJson: {$Path: 'rollOnFieldControl'}};
+
+//         // Roll-off fields: ReadOnly (1) on CREATE or when ktStarted=true, Optional (3) when ktStarted=false
+//         Staff_RollOffStatus  @Common.FieldControl: {$edmJson: {$Path: 'rollOffFieldControl'}};
+//         Staff_RollOffReasons @Common.FieldControl: {$edmJson: {$Path: 'rollOffFieldControl'}};
+//         Staff_ReasonsRemarks @Common.FieldControl: {$edmJson: {$Path: 'rollOffFieldControl'}};
+//         handoverKtBegun      @Common.FieldControl: {$edmJson: {$Path: 'rollOffFieldControl'}};
+//         RollOffDate          @Common.FieldControl: {$edmJson: {$Path: 'rollOffFieldControl'}};
+//         RollOffImpact        @Common.FieldControl: {$edmJson: {$Path: 'rollOffFieldControl'}};
+// };
+
 annotate OMTSrv.EmployeeHeader with {
-        ktStartedFC @UI.Hidden: true;
-        rollOffFC   @UI.Hidden: true;
+        // RollOnDate: ReadOnly when isNewRecord=true, Optional otherwise
+        RollOnDate           @Common.FieldControl: {$edmJson: {$If: [
+                {$Path: 'isNewRecord'},
+                1, // ReadOnly during CREATE
+                3 // Optional during EDIT
+        ]}};
+
+        // Roll-off fields: ReadOnly when isNewRecord=true OR ktStarted=true
+        Staff_RollOffStatus  @Common.FieldControl: {$edmJson: {$If: [
+                {$Or: [
+                        {$Path: 'isNewRecord'},
+                        {$Path: 'ktStarted'}
+                ]},
+                1, // ReadOnly
+                3 // Optional
+        ]}};
+
+        Staff_RollOffReasons @Common.FieldControl: {$edmJson: {$If: [
+                {$Or: [
+                        {$Path: 'isNewRecord'},
+                        {$Path: 'ktStarted'}
+                ]},
+                1,
+                3
+        ]}};
+
+        Staff_ReasonsRemarks @Common.FieldControl: {$edmJson: {$If: [
+                {$Or: [
+                        {$Path: 'isNewRecord'},
+                        {$Path: 'ktStarted'}
+                ]},
+                1,
+                3
+        ]}};
+
+        handoverKtBegun      @Common.FieldControl: {$edmJson: {$If: [
+                {$Or: [
+                        {$Path: 'isNewRecord'},
+                        {$Path: 'ktStarted'}
+                ]},
+                1,
+                3
+        ]}};
+
+        RollOffDate          @Common.FieldControl: {$edmJson: {$If: [
+                {$Or: [
+                        {$Path: 'isNewRecord'},
+                        {$Path: 'ktStarted'}
+                ]},
+                1,
+                3
+        ]}};
+
+        RollOffImpact        @Common.FieldControl: {$edmJson: {$If: [
+                {$Or: [
+                        {$Path: 'isNewRecord'},
+                        {$Path: 'ktStarted'}
+                ]},
+                1,
+                3
+        ]}};
 };
+
+// ==================== SIDE EFFECTS ====================
+
+annotate OMTSrv.EmployeeHeader with @(Common.SideEffects #ktStartedChange: {
+        SourceProperties: [ktStarted],
+        TargetProperties: [
+                'rollOffFieldControl',
+                'Staff_RollOffStatus',
+                'Staff_RollOffReasons',
+                'Staff_ReasonsRemarks',
+                'handoverKtBegun',
+                'RollOffDate',
+                'RollOffImpact_ROI'
+        ]
+});
 
 
 //Value Help mapping Annotation

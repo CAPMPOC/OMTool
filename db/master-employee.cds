@@ -26,9 +26,13 @@ entity EmployeeHeader : cuid {
             handoverKtBegun      : Boolean default false;
             ktStarted            : Boolean default true;
 
-            // --- UI control helper fields (not persisted)
-    virtual ktStartedFC          : Integer  @Core.Computed  @odata.Type: 'Edm.Byte';
-    virtual rollOffFC            : Integer  @Core.Computed  @odata.Type: 'Edm.Byte';
+            // Persisted field to track new records (will be set to false after first save)
+            isNewRecord          : Boolean default true;
+
+            // Virtual fields for UI control (not persisted)
+    virtual isKtStartedHidden    : Boolean default false;
+    virtual rollOffFieldControl  : Integer default 1; // 1 = ReadOnly, 3 = Optional
+    virtual rollOnFieldControl   : Integer default 1; // 1 = ReadOnly, 3 = Optional
 
 }
 
