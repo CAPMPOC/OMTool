@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "A simple CAP project.",
   "dependencies": {
+    "@cap-js-community/odata-v2-adapter": "^1.15.9",
     "@cap-js/hana": "^2",
     "@sap/cds": "^9",
     "@sap/hana-client": "^2.27.23",
@@ -12,10 +13,12 @@
   },
   "devDependencies": {
     "@cap-js/sqlite": "^2",
-    "@sap/hdi-deploy": "4.9.5"
+    "@sap/hdi-deploy": "4.9.5",
+    "cds-plugin-ui5": "^0.13.0"
   },
   "scripts": {
-    "start": "cds-serve"
+    "start": "cds-serve",
+    "watch-omtool": "cds watch --open com.sap.omtool.omtool/index.html?sap-ui-xx-viewCache=false --livereload false"
   },
   "private": true,
   "cds": {
@@ -28,5 +31,8 @@
     "hana": {
       "deploy-format": "hdbtable"
     }
-  }
+  },
+  "workspaces": [
+    "app/*"
+  ]
 }

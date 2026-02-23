@@ -1,0 +1,27 @@
+<mvc:View controllerName="com.sap.omtool.omtool.controller.EmployeeHeader"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:smartTable="sap.ui.comp.smarttable"
+    xmlns:smartFilterBar="sap.ui.comp.smartfilterbar"
+    xmlns="sap.m"
+    height="100%">
+    <Page id="page" title="{i18n>title}">
+        <content>
+            
+            <smartTable:SmartTable
+                id="employeeSmartTable"
+                entitySet="EmployeeHeader"
+                smartFilterId="smartFilterBar"
+                tableType="ResponsiveTable"
+                useExportToExcel="true"
+                useVariantManagement="true"
+                useTablePersonalisation="true"
+                header="Employee Data"
+                showRowCount="true"
+                persistencyKey="EmployeeHeaderSmartTable"
+                enableAutoBinding="true"
+                demandPopin="true"
+                class="sapUiResponsiveContentPadding">
+            </smartTable:SmartTable>
+        </content>
+    </Page>
+</mvc:View>
