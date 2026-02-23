@@ -270,20 +270,6 @@ annotate OMTSrv.EmployeeHeader with @(UI: {
 };
 
 // // ==================== FIELD CONTROL ANNOTATIONS ====================
-
-// annotate OMTSrv.EmployeeHeader with {
-//         // RollOnDate: ReadOnly (1) on CREATE, Optional (3) on EDIT
-//         RollOnDate           @Common.FieldControl: {$edmJson: {$Path: 'rollOnFieldControl'}};
-
-//         // Roll-off fields: ReadOnly (1) on CREATE or when ktStarted=true, Optional (3) when ktStarted=false
-//         Staff_RollOffStatus  @Common.FieldControl: {$edmJson: {$Path: 'rollOffFieldControl'}};
-//         Staff_RollOffReasons @Common.FieldControl: {$edmJson: {$Path: 'rollOffFieldControl'}};
-//         Staff_ReasonsRemarks @Common.FieldControl: {$edmJson: {$Path: 'rollOffFieldControl'}};
-//         handoverKtBegun      @Common.FieldControl: {$edmJson: {$Path: 'rollOffFieldControl'}};
-//         RollOffDate          @Common.FieldControl: {$edmJson: {$Path: 'rollOffFieldControl'}};
-//         RollOffImpact        @Common.FieldControl: {$edmJson: {$Path: 'rollOffFieldControl'}};
-// };
-
 annotate OMTSrv.EmployeeHeader with {
         // RollOnDate: ReadOnly when isNewRecord=true, Optional otherwise
         RollOnDate           @Common.FieldControl: {$edmJson: {$If: [
@@ -362,7 +348,6 @@ annotate OMTSrv.EmployeeHeader with @(Common.SideEffects #ktStartedChange: {
                 'RollOffImpact_ROI'
         ]
 });
-
 
 //Value Help mapping Annotation
 annotate OMTSrv.EmployeeHeader with {
