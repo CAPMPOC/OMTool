@@ -1,14 +1,17 @@
 <mvc:View controllerName="com.sap.omtool.omtool.controller.EmployeeHeader"
     xmlns:mvc="sap.ui.core.mvc"
     xmlns:smartTable="sap.ui.comp.smarttable"
+    xmlns:core="sap.ui.core"
     xmlns:smartFilterBar="sap.ui.comp.smartfilterbar"
     xmlns="sap.m"
     height="100%">
     <Page id="page" title="{i18n>title}">
         <content>
+
+            <core:Fragment fragmentName="com.sap.omtool.omtool.view.fragments.FilterBar" type="XML"/>
             
             <smartTable:SmartTable
-                id="employeeSmartTable"
+                id="smartTable"
                 entitySet="EmployeeHeader"
                 smartFilterId="smartFilterBar"
                 tableType="ResponsiveTable"
