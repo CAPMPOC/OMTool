@@ -48,6 +48,57 @@ module.exports = cds.service.impl(async function () {
         return rollOff > rollOn;
     }
 
+    /**
+     * Calculate months elapsed since RollOnDate
+     * Returns 0 if RollOnDate is in the future or not set
+     */
+    function calculateMonthsElapsed(rollOnDate) {
+        if (!rollOnDate) return 0;
+
+        const rollOn = new Date(rollOnDate);
+        const today = new Date();
+
+        // If RollOnDate is in the future, return 0
+        if (rollOn > today) return 0;
+
+        const monthsDiff = (today.getFullYear() - rollOn.getFullYear()) * 12
+            + (today.getMonth() - rollOn.getMonth());
+
+        // Ensure non-negative value
+        return Math.max(0, monthsDiff);
+    }
+
+    /**
+     * Calculate experience fields for a record
+     * - SAP (displayed) = stored SAP + monthsElapsed
+     * - SAPToday = NonSAP + SAP (displayed)
+     */
+    function calculateExperienceFields(record) {
+        const storedNonSAP = record.NonSAP || 0;
+        const storedSAP = record.SAP || 0;
+        const monthsElapsed = calculateMonthsElapsed(record.RollOnDate);
+
+        // Calculate displayed SAP (original + months since onboarding)
+        const calculatedSAP = storedSAP + monthsElapsed;
+
+        // Calculate total experience
+        const calculatedSAPToday = storedNonSAP + calculatedSAP;
+
+        return {
+            storedSAP: storedSAP,
+            displayedSAP: calculatedSAP,
+            SAPToday: calculatedSAPToday,
+            monthsElapsed: monthsElapsed
+        };
+    }
+
+    /**
+     * Check if RollOffDate is filled (not null, undefined, or empty string)
+     */
+    function isRollOffDateFilled(rollOffDate) {
+        return rollOffDate !== null && rollOffDate !== undefined && rollOffDate !== '';
+    }
+
     // ==================== BEFORE NEW (DRAFT) HANDLER ====================
     // Use 'before' instead of 'on' to avoid UPDATE issues
 
@@ -58,6 +109,8 @@ module.exports = cds.service.impl(async function () {
         req.data.RollOnDate = getTodayDate();
         req.data.Staff_RollOffStatus = false;
         req.data.handoverKtBegun = false;
+        req.data.NonSAP = 0;
+        req.data.SAP = 0;
 
         console.log(`[BEFORE NEW DRAFT] Setting defaults - RollOnDate: ${req.data.RollOnDate}, ktStarted: ${req.data.ktStarted}`);
     });
@@ -73,6 +126,8 @@ module.exports = cds.service.impl(async function () {
         data.RollOnDate = data.RollOnDate || getTodayDate();
         data.Staff_RollOffStatus = data.Staff_RollOffStatus ?? false;
         data.handoverKtBegun = data.handoverKtBegun ?? false;
+        data.NonSAP = data.NonSAP ?? 0;
+        data.SAP = data.SAP ?? 0;
 
         console.log(`[CREATE] New employee - ktStarted: ${data.ktStarted}, isNewRecord: ${data.isNewRecord}, RollOnDate: ${data.RollOnDate}`);
     });
@@ -91,6 +146,25 @@ module.exports = cds.service.impl(async function () {
         if (!isRollOffDateValid(data.RollOffDate, data.RollOnDate)) {
             req.error(400, 'Roll-Off Date must be greater than Roll-On Date', 'RollOffDate');
         }
+
+        // Validation: Mandatory fields when RollOffDate is filled
+        if (isRollOffDateFilled(data.RollOffDate)) {
+            if (!data.Staff_RollOffStatus) {
+                req.error(400, 'Employee Roll-off Status is required when Roll-Off Date is filled', 'Staff_RollOffStatus');
+            }
+            if (!data.Staff_RollOffReasons) {
+                req.error(400, 'Employee Roll-off Reason is required when Roll-Off Date is filled', 'Staff_RollOffReasons');
+            }
+            if (!data.Staff_ReasonsRemarks) {
+                req.error(400, 'Reasons/Remarks is required when Roll-Off Date is filled', 'Staff_ReasonsRemarks');
+            }
+            if (!data.RollOffImpact_ROI) {
+                req.error(400, 'Impact of Roll Off is required when Roll-Off Date is filled', 'RollOffImpact_ROI');
+            }
+            if (!data.handoverKtBegun) {
+                req.error(400, 'Handover KT is required when Roll-Off Date is filled', 'handoverKtBegun');
+            }
+        }
     });
 
     // ==================== AFTER READ HANDLER ====================
@@ -100,6 +174,29 @@ module.exports = cds.service.impl(async function () {
 
         for (const record of records) {
             if (!record || !record.ID) continue;
+
+            // Set isRollOffDateFilled virtual field
+            record.isRollOffDateFilled = isRollOffDateFilled(record.RollOffDate);
+
+            // Calculate experience fields for saved records
+            if (record.isNewRecord === false) {
+                const experience = calculateExperienceFields(record);
+
+                // Override SAP with calculated value for display
+                record.SAP = experience.displayedSAP;
+
+                // Set virtual SAPToday field
+                record.SAPToday = experience.SAPToday;
+
+                console.log(`[READ] ID: ${record.ID}, Stored SAP: ${experience.storedSAP}, Displayed SAP: ${record.SAP}, SAPToday: ${record.SAPToday}, MonthsElapsed: ${experience.monthsElapsed}`);
+            } else {
+                // For new records, just calculate SAPToday without adding monthsElapsed
+                const storedNonSAP = record.NonSAP || 0;
+                const storedSAP = record.SAP || 0;
+                record.SAPToday = storedNonSAP + storedSAP;
+
+                console.log(`[READ - New Record] NonSAP: ${storedNonSAP}, SAP: ${storedSAP}, SAPToday: ${record.SAPToday}`);
+            }
 
             // Check 3-month condition for existing records
             if (record.isNewRecord === false && record.RollOnDate && isOlderThanThreeMonths(record.RollOnDate)) {
@@ -125,6 +222,35 @@ module.exports = cds.service.impl(async function () {
         }
     });
 
+    // ==================== AFTER READ (DRAFTS) HANDLER ====================
+
+    this.after('READ', EmployeeHeader.drafts, async (data, req) => {
+        const records = Array.isArray(data) ? data : [data];
+
+        for (const record of records) {
+            if (!record) continue;
+
+            // Set isRollOffDateFilled virtual field
+            record.isRollOffDateFilled = isRollOffDateFilled(record.RollOffDate);
+
+            // For new records (drafts), show entered values and calculate SAPToday
+            if (record.isNewRecord === true) {
+                const storedNonSAP = record.NonSAP || 0;
+                const storedSAP = record.SAP || 0;
+                record.SAPToday = storedNonSAP + storedSAP;
+
+                console.log(`[READ DRAFT - New] NonSAP: ${storedNonSAP}, SAP: ${storedSAP}, SAPToday: ${record.SAPToday}`);
+            } else {
+                // For existing records being edited, show calculated values
+                const experience = calculateExperienceFields(record);
+                record.SAP = experience.displayedSAP;
+                record.SAPToday = experience.SAPToday;
+
+                console.log(`[READ DRAFT - Edit] Stored SAP: ${experience.storedSAP}, Displayed SAP: ${record.SAP}, SAPToday: ${record.SAPToday}`);
+            }
+        }
+    });
+
     // ==================== AFTER EDIT (DRAFT) HANDLER ====================
 
     this.after('EDIT', EmployeeHeader, async (data, req) => {
@@ -136,6 +262,9 @@ module.exports = cds.service.impl(async function () {
         } else {
             data.isKtStartedHidden = false;
         }
+
+        // Set isRollOffDateFilled
+        data.isRollOffDateFilled = isRollOffDateFilled(data.RollOffDate);
 
         console.log(`[EDIT] ID: ${data.ID}, isNewRecord: ${data.isNewRecord}, ktStarted: ${data.ktStarted}`);
     });
@@ -185,6 +314,18 @@ module.exports = cds.service.impl(async function () {
 
         if ('ktStarted' in req.data) {
             console.log(`[PATCH DRAFT] ktStarted changed to: ${data.ktStarted}`);
+        }
+
+        // Log when experience fields are updated
+        if ('NonSAP' in req.data || 'SAP' in req.data) {
+            console.log(`[PATCH DRAFT] Experience updated - NonSAP: ${data.NonSAP}, SAP: ${data.SAP}`);
+        }
+
+        // Update isRollOffDateFilled when RollOffDate changes
+        if ('RollOffDate' in req.data) {
+            const filled = isRollOffDateFilled(data.RollOffDate);
+            data.isRollOffDateFilled = filled;
+            console.log(`[PATCH DRAFT] RollOffDate changed, isRollOffDateFilled: ${filled}`);
         }
     });
 });

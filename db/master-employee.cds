@@ -16,9 +16,9 @@ entity EmployeeHeader : cuid {
             Staff_RollOffStatus  : Boolean default false;
             RollOffDate          : Date;
             Accessibility        : Association to AccessibilityVH;
-            NonSAP               : String(10);
-            SAP                  : String(10);
-            SAPToday             : String(10);
+            NonSAP               : Integer default 0;
+            SAP                  : Integer default 0;
+    virtual SAPToday             : Integer;
             RollOffImpact        : Association to RollofImpactVH;
             Skill                : Association to SkillVH;
             Staff_RollOffReasons : String(100);
@@ -33,6 +33,7 @@ entity EmployeeHeader : cuid {
     virtual isKtStartedHidden    : Boolean default false;
     virtual rollOffFieldControl  : Integer default 1; // 1 = ReadOnly, 3 = Optional
     virtual rollOnFieldControl   : Integer default 1; // 1 = ReadOnly, 3 = Optional
+    virtual isRollOffDateFilled  : Boolean default false;
 
 }
 

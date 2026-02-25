@@ -14,7 +14,8 @@ service OMTSrv {
 annotate OMTSrv.EmployeeHeader with @(UI: {
         SelectionFields       : [
                 Accessibility_AccessID,
-                Location_LocID
+                Location_LocID,
+                ktStarted
         ],
         HeaderInfo            : {
                 $Type         : 'UI.HeaderInfoType',
@@ -122,7 +123,6 @@ annotate OMTSrv.EmployeeHeader with @(UI: {
                         {
                                 $Type: 'UI.DataField',
                                 Value: ktStarted,
-                                // Common.FieldControl: {$Path: 'ktStartedFC'},
                                 Label: 'Has on-boarding KT begun'
                         },
                 ]
@@ -285,7 +285,12 @@ annotate OMTSrv.EmployeeHeader with {
                         {$Path: 'ktStarted'}
                 ]},
                 1, // ReadOnly
-                3 // Optional
+                {$If: [
+                        {$Path: 'RollOffDate'},
+
+                        7, // Mandatory when RollOffDate is filled
+                        3 // Optional when RollOffDate is empty
+                ]}
         ]}};
 
         Staff_RollOffReasons @Common.FieldControl: {$edmJson: {$If: [
@@ -293,8 +298,13 @@ annotate OMTSrv.EmployeeHeader with {
                         {$Path: 'isNewRecord'},
                         {$Path: 'ktStarted'}
                 ]},
-                1,
-                3
+                1, // ReadOnly
+                {$If: [
+                        {$Path: 'RollOffDate'},
+
+                        7, // Mandatory when RollOffDate is filled
+                        3 // Optional when RollOffDate is empty
+                ]}
         ]}};
 
         Staff_ReasonsRemarks @Common.FieldControl: {$edmJson: {$If: [
@@ -302,8 +312,13 @@ annotate OMTSrv.EmployeeHeader with {
                         {$Path: 'isNewRecord'},
                         {$Path: 'ktStarted'}
                 ]},
-                1,
-                3
+                1, // ReadOnly
+                {$If: [
+                        {$Path: 'RollOffDate'},
+
+                        7, // Mandatory when RollOffDate is filled
+                        3 // Optional when RollOffDate is empty
+                ]}
         ]}};
 
         handoverKtBegun      @Common.FieldControl: {$edmJson: {$If: [
@@ -311,8 +326,13 @@ annotate OMTSrv.EmployeeHeader with {
                         {$Path: 'isNewRecord'},
                         {$Path: 'ktStarted'}
                 ]},
-                1,
-                3
+                1, // ReadOnly
+                {$If: [
+                        {$Path: 'RollOffDate'},
+
+                        7, // Mandatory when RollOffDate is filled
+                        3 // Optional when RollOffDate is empty
+                ]}
         ]}};
 
         RollOffDate          @Common.FieldControl: {$edmJson: {$If: [
@@ -329,13 +349,36 @@ annotate OMTSrv.EmployeeHeader with {
                         {$Path: 'isNewRecord'},
                         {$Path: 'ktStarted'}
                 ]},
-                1,
-                3
+                1, // ReadOnly
+                {$If: [
+                        {$Path: 'RollOffDate'},
+
+                        7, // Mandatory when RollOffDate is filled
+                        3 // Optional when RollOffDate is empty
+                ]}
         ]}};
+
+        // NonSAP: Editable on CREATE, ReadOnly after SAVE
+        NonSAP               @Common.FieldControl: {$edmJson: {$If: [
+                {$Path: 'isNewRecord'},
+                3, // Optional (Editable) during CREATE
+                1 // ReadOnly after SAVE
+        ]}};
+
+        // SAP: Editable on CREATE, ReadOnly after SAVE
+        SAP                  @Common.FieldControl: {$edmJson: {$If: [
+                {$Path: 'isNewRecord'},
+                3, // Optional (Editable) during CREATE
+                1 // ReadOnly after SAVE
+        ]}};
+
+        // SAPToday: Always ReadOnly (calculated field)
+        SAPToday             @Common.FieldControl: #ReadOnly;
 };
 
 // ==================== SIDE EFFECTS ====================
 
+//For Roll-Off Details fields
 annotate OMTSrv.EmployeeHeader with @(Common.SideEffects #ktStartedChange: {
         SourceProperties: [ktStarted],
         TargetProperties: [
@@ -345,6 +388,28 @@ annotate OMTSrv.EmployeeHeader with @(Common.SideEffects #ktStartedChange: {
                 'Staff_ReasonsRemarks',
                 'handoverKtBegun',
                 'RollOffDate',
+                'RollOffImpact_ROI'
+        ]
+});
+
+//For Experience Calculations
+annotate OMTSrv.EmployeeHeader with @(Common.SideEffects #ExperienceChange: {
+        SourceProperties: [
+                'NonSAP',
+                'SAP'
+        ],
+        TargetProperties: ['SAPToday']
+});
+
+//For RollOfDate Changes
+annotate OMTSrv.EmployeeHeader with @(Common.SideEffects #RollOffDateChange: {
+        SourceProperties: ['RollOffDate'],
+        TargetProperties: [
+                'isRollOffDateFilled',
+                'Staff_RollOffStatus',
+                'Staff_RollOffReasons',
+                'Staff_ReasonsRemarks',
+                'handoverKtBegun',
                 'RollOffImpact_ROI'
         ]
 });
