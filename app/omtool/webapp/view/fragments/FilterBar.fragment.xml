@@ -30,31 +30,50 @@
                     <core:Item key="{AccessID}" text="{Description}" />
                 </ComboBox>
                 
-                <!-- Dropdown 2 -->
-                <ComboBox
-                    id="filterDropdown2"
-                    placeholder="Filter 2"
-                    width="180px"
-                    selectionChange=".onFilterChange"
+                <!-- Value Help -->
+                <!-- <Input
+                    id="locationValueHelp"
+                    placeholder="Select Location"
+                    width="200px"
+                    showValueHelp="true"
+                    valueHelpRequest=".onLocationValueHelp"
+                    change=".onLocationChange"
+                    class="sapUiTinyMarginEnd"/> -->
+
+                <Input
+                    id="locationValueHelp"
+                    placeholder="Select Location"
+                    width="200px"
+                    showClearIcon="true"
+                    showValueHelp="true"
+                    valueHelpRequest=".onLocationValueHelp"
+                    change=".onLocationChange"
+                    showSuggestion="true"
+                    suggestionItems="{
+					    path: '/LocationVH'
+				        }"
+                    suggest=".onLocationSuggest"
+                    suggestionItemSelected=".onLocationSuggestionSelected"
                     class="sapUiTinyMarginEnd">
-                    <items>
-                        <core:Item key="all" text="All"/>
-                        <core:Item key="option1" text="Option 1"/>
-                        <core:Item key="option2" text="Option 2"/>
-                    </items>
-                </ComboBox>
+                    <suggestionItems>
+                        <core:Item 
+                            key="{LocID}" 
+                            text="{LocDesc}"/>
+                    </suggestionItems>
+                </Input>
                 
                 <!-- Dropdown 3 -->
                 <ComboBox
                     id="filterDropdown3"
-                    placeholder="Filter 3"
-                    width="180px"
-                    selectionChange=".onFilterChange"
+                    placeholder="Select KT Status"
+                    width="200px"
+                    showClearIcon="true"
+                    selectionChange=".onKtStatusChange"
                     class="sapUiTinyMarginEnd">
                     <items>
-                        <core:Item key="all" text="All"/>
-                        <core:Item key="option1" text="Option 1"/>
-                        <core:Item key="option2" text="Option 2"/>
+                        <core:Item key="" text="Not Selected"/>
+                        <core:Item key="true" text="Yes"/>
+                        <core:Item key="false" text="No"/>
                     </items>
                 </ComboBox>
                 
