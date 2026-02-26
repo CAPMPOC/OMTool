@@ -24,7 +24,14 @@
                 enableAutoBinding="true"
                 demandPopin="true"
                 class="sapUiResponsiveContentPadding">
-            </smartTable:SmartTable>
+    <smartTable:customToolbar>
+        <OverflowToolbar id="_toolBar" design="Transparent">
+            <ToolbarSpacer id="IdToolBar"/>
+            <Button id="_addEmpBtn" class="sapUiSmallMargin" icon="sap-icon://add-employee" type="Default"
+					badgeStyle="Default" text="Add Employee" press="onAddEmployee"/>
+                    </OverflowToolbar>
+    </smartTable:customToolbar>
+                    </smartTable:SmartTable>
         </content>
     </Page>
 </mvc:View>

@@ -163,6 +163,134 @@ sap.ui.define([
             oBinding.filter(aFilters);
 
             console.log("Filters applied:", aFilters.length);
+            this._oDialog = null;
+        },
+
+        onAddEmployee: async function () {
+            if (!this._pDialog) {
+                this._pDialog = Fragment.load({
+                    id: this.getView().getId(),
+                    name: "com.sap.omtool.omtool.view.fragments.DialogFragment",
+                    controller: this
+                }).then(function (oDialog) {
+                    this.getView().addDependent(oDialog);
+                    return oDialog;
+                }.bind(this));
+            }
+
+            this._pDialog.then(function (oDialog) {
+                // Initialize empty employee model
+                const oEmptyEmployee = {
+                    Empid: "",
+                    firstName: "",
+                    lastName: "",
+                    location: "",
+                    CID: "",
+                    ProductGroup: "",
+                    ServiceGroup: "",
+                    Product: "",
+                    Position: "",
+                    kickOffDate: null,
+                    rollOffDate: null,
+                    monthsExperience: 0,
+                    statusNewEmployee: false,
+                    statusKTStarted: false,
+                    statusRollOffStarted: false,
+                    statusHandoverKTBegun: false
+                };
+                
+                const oEmployeeModel = new sap.ui.model.json.JSONModel(oEmptyEmployee);
+                this.getView().setModel(oEmployeeModel, "employee");
+                
+                oDialog.open();
+            }.bind(this));
+        },
+
+        // Create employee handler
+        onAddEmployeePress: function () {
+            const oView = this.getView();
+            const oModel = oView.getModel(); // OData V4 model
+            const oEmployeeData = oView.getModel("employee").getData();
+            
+            // Validate required fields
+            if (!this._validateEmployeeData(oEmployeeData)) {
+                MessageBox.error("Please fill all required fields");
+                return;
+            }
+
+            // Prepare payload for backend
+            const oPayload = {
+                Empid: oEmployeeData.Empid,
+                FirstName: oEmployeeData.firstName,
+                LastName: oEmployeeData.lastName,
+                Location_LocID: oEmployeeData.location,
+                CID: oEmployeeData.CID,
+                ProductGroup: oEmployeeData.ProductGroup,
+                ServiceGroup: oEmployeeData.ServiceGroup,
+                Product: oEmployeeData.Product,
+                RollOnDate: oEmployeeData.kickOffDate,
+                RollOffDate: oEmployeeData.rollOffDate,
+                SAP: oEmployeeData.monthsExperience,
+                isNewRecord: oEmployeeData.statusNewEmployee,
+                ktStarted: oEmployeeData.statusKTStarted,
+                handoverKtBegun: oEmployeeData.statusHandoverKTBegun,
+                IsActiveEntity: false
+            };
+
+            const oListBinding = oModel.bindList("/EmployeeHeader");
+            
+            // Show busy indicator
+            oView.setBusy(true);
+
+            // Call 1: POST to create draft
+            const oContext = oListBinding.create(oPayload);
+            
+            oContext.created().then(() => {
+                // Call 2 & 3: Expand and select specific fields (automatic with OData V4)
+                const sPath = oContext.getPath();
+                
+                return oModel.read(sPath, {
+                    $select: "Accessibility,Location,NonSAP,RollOffDate,SAP,Skill_SkillID,handoverKtBegun,isNewRecord",
+                    $expand: "Accessibility($select=AccessID,Description),Location($select=LocDesc,LocID)"
+                });
+            }).then(() => {
+                // Success - refresh the table
+                oView.setBusy(false);
+                MessageBox.success("Employee created successfully", {
+                    onClose: function () {
+                        this._closeDialog();
+                        this._refreshSmartTable();
+                    }.bind(this)
+                });
+            }).catch((oError) => {
+                oView.setBusy(false);
+                MessageBox.error("Error creating employee: " + oError.message);
+            });
+        },
+
+        _validateEmployeeData: function (oData) {
+            return oData.Empid && 
+                   oData.firstName && 
+                   oData.lastName && 
+                   oData.kickOffDate &&
+                   oData.monthsExperience >= 0;
+        },
+
+        _closeDialog: function () {
+            this._pDialog.then(function (oDialog) {
+                oDialog.close();
+            });
+        },
+
+        _refreshSmartTable: function () {
+            const oSmartTable = this.byId("employeeSmartTable");
+            if (oSmartTable) {
+                oSmartTable.rebindTable();
+            }
+        },
+
+        onCancelEmployee: function () {
+            this._closeDialog();
         }
     });
 });

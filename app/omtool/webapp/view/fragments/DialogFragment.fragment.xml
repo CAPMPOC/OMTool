@@ -1,0 +1,256 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:l="sap.ui.layout">
+    
+    <Dialog
+        id="employeeDialog"
+        title="Add Employee"
+        contentWidth="500px"
+        contentHeight="auto"
+        resizable="false"
+        draggable="true">
+        
+        <content>
+            <VBox id="vboxMain" class="sapUiSmallMarginBegin sapUiSmallMarginTop">
+                <Title 
+                        id="titleBasicInformation" 
+                        text="Basic Information" 
+                        level="H4"
+                        class="sapUiSmallMarginBottom"/>
+                <!-- Employee ID -->
+                <VBox id="vboxEmployeeId" class="sapUiSmallMarginBottom">
+                    <Label id="lblEmployeeId" text="Employee ID" required="true"/>
+                    <Input 
+                        id="inputEmployeeId" 
+                        value="{employee>/Empid}"
+                        width="80%"
+                        placeholder=""/>
+                </VBox>
+                
+                <HBox id="hboxNames">
+                <VBox id="vboxFirstName" class="sapUiSmallMarginEnd" width="48%">
+                    <Label id="lblFirstName" text="First Name" required="true"/>
+                    <Input 
+                        id="inputFirstName" 
+                        value="{employee>/firstName}"
+                        width="100%"
+                        placeholder=""/>
+                </VBox>
+                <VBox id="vboxLastName" class="sapUiSmallMarginEnd" width="48%">
+                    <Label id="lblLastName" text="Last Name" required="true"/>
+                    <Input 
+                        id="inputLastName" 
+                        value="{employee>/lastName}"
+                        width="100%"
+                        placeholder=""/>
+                </VBox>
+                </HBox>
+                
+                <!-- Address -->
+                <HBox >
+                <VBox id="vboxLocation" width="48%" class="sapUiSmallMarginEnd">
+                    <Label id="lblLocation" text="Employee Location"/>
+                    <Input 
+                        id="inputLocation" 
+                        value="{employee>/location}"
+                        width="100%"
+                        placeholder=""/>
+                </VBox>
+
+                <VBox id="vboxCuserId" width="48%" class="sapUiSmallMarginEnd">
+                    <Label id="lblCuserId" text="C-User ID"/>
+                    <Input 
+                        id="inputCuserId" 
+                        value="{employee>/CID}"
+                        width="100%"
+                        placeholder=""/>
+                </VBox>
+                </HBox>
+                
+                <!-- Date Fields Row -->
+                <Title 
+                        id="titleAssignment" 
+                        text="Assignment" 
+                        level="H4"
+                        class="sapUiSmallMarginBottom sapUiSmallMarginTop"/>
+                    <HBox>
+                  <VBox id="vboxProductGroup" width="48%" class="sapUiSmallMarginEnd">
+                    <Label id="lblProductGroup" text="ProductGroup"/>
+                    <Input 
+                        id="inputProductGroup" 
+                        value="{employee>/ProductGroup}"
+                        width="100%"
+                        placeholder=""/>
+                </VBox>
+
+                <VBox id="vboxServiceGroup" width="48%">
+                    <Label id="lblServiceGroup" text="Service Group"/>
+                    <Input 
+                        id="inputServiceGroup" 
+                        value="{employee>/ServiceGroup}"
+                        width="100%"
+                        placeholder=""/>
+                </VBox>
+                </HBox>
+
+                <HBox id="hboxProduct">
+                <VBox id="vboxProduct"  width="48%"  class="sapUiSmallMarginEnd">
+                    <Label id="lblProduct" text="Product"/>
+                    <Input 
+                        id="inputProduct" 
+                        value="{employee>/Product}"
+                        width="100%"
+                        placeholder=""/>
+                </VBox>   
+
+                <VBox id="vboxPosition"  width="48%">
+                    <Label id="lblPosition" text="Position"/>
+                    <Input 
+                        id="inputPosition" 
+                        value="{employee>/Position}"
+                        width="100%"
+                        placeholder=""/>
+                </VBox>      
+                </HBox>
+                <HBox id="hboxDates" class="sapUiSmallMarginTop">
+                    
+                    <!-- Kick-off Date -->
+                    <VBox id="vboxKickOffDate" width="48%" class="sapUiSmallMarginEnd">
+                    
+                        <Label id="lblKickOffDate" text="Kick-off Date" required="true"/>
+                        <DatePicker
+                            id="dpKickOffDate"
+                            value="{employee>/kickOffDate}"
+                            valueFormat="yyyy-MM-dd"
+                            displayFormat="MM/dd/yyyy"
+                            width="100%"
+                            placeholder="mm/dd/yyyy"/>
+                    </VBox>
+                    
+                    <!-- Roll-off Date -->
+                    <VBox id="vboxRollOffDate" width="48%">
+                        <Label id="lblRollOffDate" text="Roll-off Date"/>
+                        <DatePicker
+                            id="dpRollOffDate"
+                            value="{employee>/rollOffDate}"
+                            valueFormat="yyyy-MM-dd"
+                            displayFormat="MM/dd/yyyy"
+                            width="100%"
+                            placeholder="mm/dd/yyyy"/>
+                    </VBox>
+                </HBox>
+                
+                <!-- Months Experience -->
+                
+                <VBox id="vboxExperience" class="sapUiSmallMarginTop">
+                <Title 
+                        id="titleExperience" 
+                        text="Experience" 
+                        level="H4"
+                        class="sapUiSmallMarginBottom"/>
+                    
+                  <VBox id="vboxSAPExperience" width="48%" class="sapUiSmallMarginEnd">
+                    <Label id="lblSAPExperience" text="SAP Experience" required="true"/>
+                    <Input  id="sapExperience" value="{employee>/SAP}"/>
+        </VBox>
+                </VBox>
+                <VBox id="vboxNonSAPExp"  width="48%">
+                    <Label id="lblNonSAPExp" text="Non-SAP Experience"/>
+                    <Input 
+                        id="inputNonSAPExp" 
+                        value="{employee>/NonSAP}"
+                        width="100%"
+                        placeholder=""/>
+                </VBox> 
+
+                <VBox id="vboxTotalExp"  width="48%">
+                    <Label id="lblTotalExp" text="Total Experience"/>
+                    <Input 
+                        id="inputTotalExp" 
+                        value="{employee>/SAPToday}"
+                        width="100%"
+                        placeholder=""/>
+                </VBox> 
+                
+                
+                <!-- Status Tracking Section -->
+                <VBox id="vboxStatusTracking" class="sapUiMediumMarginTop">
+                    
+                    <!-- Status Tracking Title -->
+                    <Title 
+                        id="titleStatusTracking" 
+                        text="Status Tracking" 
+                        level="H4"
+                        class="sapUiSmallMarginBottom"/>
+                    
+                    <!-- New Employee -->
+                    <HBox 
+                        id="hboxNewEmployee" 
+                        justifyContent="SpaceBetween" 
+                        alignItems="Center"
+                        width="100%"
+                        class="sapUiSmallMarginTop">
+                        <Text id="txtNewEmployee" text="New Employee"/>
+                        <Switch 
+                            id="switchNewEmployee" 
+                            state="{employee>/statusNewEmployee}"/>
+                    </HBox>
+                    
+                    <!-- KT Started -->
+                    <HBox 
+                        id="hboxKTStarted" 
+                        justifyContent="SpaceBetween" 
+                        alignItems="Center"
+                        width="100%"
+                        class="sapUiSmallMarginTop">
+                        <Text id="txtKTStarted" text="KT Started"/>
+                        <Switch 
+                            id="switchKTStarted" 
+                            state="{employee>/statusKTStarted}"/>
+                    </HBox>
+                    
+                    <!-- Roll-off Started -->
+                    <HBox 
+                        id="hboxRollOffStarted" 
+                        justifyContent="SpaceBetween" 
+                        alignItems="Center"
+                        width="100%"
+                        class="sapUiSmallMarginTop">
+                        <Text id="txtRollOffStarted" text="Roll-off Started"/>
+                        <Switch 
+                            id="switchRollOffStarted" 
+                            state="{employee>/statusRollOffStarted}"/>
+                    </HBox>
+                    
+                    <!-- Handover/KT Begun -->
+                    <HBox 
+                        id="hboxHandoverKT" 
+                        justifyContent="SpaceBetween" 
+                        alignItems="Center"
+                        width="100%"
+                        class="sapUiSmallMarginTop">
+                        <Text id="txtHandoverKT" text="Handover/KT Begun"/>
+                        <Switch 
+                            id="switchHandoverKT" 
+                            state="{employee>/statusHandoverKTBegun}"/>
+                    </HBox>
+                    
+                </VBox>
+                
+            </VBox>
+        </content>
+        
+        <buttons>
+            <Button 
+                id="btnCancel"
+                text="Cancel" 
+                press="onCancelEmployee"/>
+            <Button 
+                id="btnAddEmployee"
+                text="Add Employee" 
+                type="Emphasized"
+                press="onAddEmployeePress"/>
+        </buttons>
+    </Dialog>
+</core:FragmentDefinition>
