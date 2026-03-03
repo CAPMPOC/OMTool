@@ -5,6 +5,9 @@
   "dependencies": {
     "@cap-js-community/odata-v2-adapter": "^1.15.9",
     "@cap-js/hana": "^2",
+    "@sap-cloud-sdk/connectivity": "^4.5.1",
+    "@sap-cloud-sdk/http-client": "^4.5.1",
+    "@sap-cloud-sdk/resilience": "^4.5.1",
     "@sap/cds": "^9",
     "@sap/hana-client": "^2.27.23",
     "@sap/xssec": "^4.12.2",
@@ -26,6 +29,12 @@
       "index": true
     },
     "requires": {
+      "SBPA_API": {
+        "kind": "rest",
+        "credentials": {
+          "destination": "SBPA_API"
+        }
+      },
       "db": "hana"
     },
     "hana": {
