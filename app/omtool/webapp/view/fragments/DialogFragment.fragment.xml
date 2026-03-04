@@ -118,14 +118,15 @@
                     <!-- Kick-off Date -->
                     <VBox id="vboxKickOffDate" width="48%" class="sapUiSmallMarginEnd">
                     
-                        <Label id="lblKickOffDate" text="Kick-off Date" required="true"/>
+                        <Label id="lblKickOffDate" text="Roll-On Date" required="true"/>
                         <DatePicker
                             id="dpKickOffDate"
-                            value="{employee>/kickOffDate}"
+                            value="{employee>/rollOnDate}"
                             valueFormat="yyyy-MM-dd"
                             displayFormat="MM/dd/yyyy"
                             width="100%"
-                            placeholder="mm/dd/yyyy"/>
+                            placeholder="mm/dd/yyyy"
+                            />
                     </VBox>
                     
                     <!-- Roll-off Date -->

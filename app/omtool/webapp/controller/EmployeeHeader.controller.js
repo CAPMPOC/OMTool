@@ -305,12 +305,12 @@ sap.ui.define([
             var oDropdown3 = this.byId("filterDropdown3");
             if (oDropdown3) {
                 var sKtStatusKey = oDropdown3.getSelectedKey();
-                
+
                 // Only add filter if a value is selected (not "All")
                 if (sKtStatusKey && sKtStatusKey !== "") {
                     // Convert string to boolean
                     var bKtStarted = (sKtStatusKey === "true");
-                    
+
                     // IMPORTANT: Replace "ktStarted" with your actual field name if different
                     var oKtFilter = new Filter("ktStarted", FilterOperator.EQ, bKtStarted);
                     aFilters.push(oKtFilter);
@@ -324,7 +324,7 @@ sap.ui.define([
             oBinding.filter(aFilters);
 
             console.log("Filters applied:", aFilters.length);
-            
+
         },
 
         onAddEmployee: async function () {
@@ -352,9 +352,11 @@ sap.ui.define([
                     ServiceGroup: "",
                     Product: "",
                     Position: "",
-                    kickOffDate: null,
+                    rollOnDate: null,
                     rollOffDate: null,
-                    monthsExperience: 0,
+                    SAP: 0,
+                    NonSAP: 0,
+                    SAPToday: 0,
                     statusNewEmployee: false,
                     statusKTStarted: false,
                     statusRollOffStarted: false,
@@ -368,91 +370,289 @@ sap.ui.define([
             }.bind(this));
         },
 
-        // Create employee handler
-        onAddEmployeePress: function () {
-            const oView = this.getView();
-            const oModel = oView.getModel(); // OData V4 model
-            const oEmployeeData = oView.getModel("employee").getData();
-            
-            // Validate required fields
-            if (!this._validateEmployeeData(oEmployeeData)) {
-                MessageBox.error("Please fill all required fields");
-                return;
-            }
-
-            // Prepare payload for backend
-            const oPayload = {
-                Empid: oEmployeeData.Empid,
-                FirstName: oEmployeeData.firstName,
-                LastName: oEmployeeData.lastName,
-                Location_LocID: oEmployeeData.location,
-                CID: oEmployeeData.CID,
-                ProductGroup: oEmployeeData.ProductGroup,
-                ServiceGroup: oEmployeeData.ServiceGroup,
-                Product: oEmployeeData.Product,
-                RollOnDate: oEmployeeData.kickOffDate,
-                RollOffDate: oEmployeeData.rollOffDate,
-                SAP: oEmployeeData.monthsExperience,
-                isNewRecord: oEmployeeData.statusNewEmployee,
-                ktStarted: oEmployeeData.statusKTStarted,
-                handoverKtBegun: oEmployeeData.statusHandoverKTBegun,
-                IsActiveEntity: false
-            };
-
-            const oListBinding = oModel.bindList("/EmployeeHeader");
-            
-            // Show busy indicator
-            oView.setBusy(true);
-
-            // Call 1: POST to create draft
-            const oContext = oListBinding.create(oPayload);
-            
-            oContext.created().then(() => {
-                // Call 2 & 3: Expand and select specific fields (automatic with OData V4)
-                const sPath = oContext.getPath();
+        onAddEmployeePress: async function () {
+            try {
+                const oView = this.getView();
+                const oEmployeeModel = oView.getModel("employee");
+                const oEmployeeData = oEmployeeModel.getData();
                 
-                return oModel.read(sPath, {
-                    $select: "Accessibility,Location,NonSAP,RollOffDate,SAP,Skill_SkillID,handoverKtBegun,isNewRecord",
-                    $expand: "Accessibility($select=AccessID,Description),Location($select=LocDesc,LocID)"
-                });
-            }).then(() => {
-                // Success - refresh the table
-                oView.setBusy(false);
-                MessageBox.success("Employee created successfully", {
-                    onClose: function () {
+                // Validate required fields
+                if (!this._validateEmployeeData(oEmployeeData)) {
+                    MessageBox.error("Please fill all required fields:\n- Employee ID\n- First Name\n- Last Name\n- Kick-off Date\n- SAP Experience");
+                    return;
+                }
+                
+                // Show busy indicator
+                const oDialog = this.byId("employeeDialog");
+                oDialog.setBusy(true);
+                
+                const oModel = this.getView().getModel(); // Your OData V2 model
+                
+                // Execute batch operation
+                await this._createAndSaveEmployee(oModel, oEmployeeData);
+                
+                // Success - close dialog and refresh
+                oDialog.setBusy(false);
+                
+                MessageBox.success("Employee saved successfully", {
+                    onClose: function() {
                         this._closeDialog();
-                        this._refreshSmartTable();
+                        this._refreshMainView();
                     }.bind(this)
                 });
-            }).catch((oError) => {
-                oView.setBusy(false);
-                MessageBox.error("Error creating employee: " + oError.message);
+                
+            } catch (error) {
+                MessageBox.error("Error saving employee: " + (error.message || "Unknown error"));
+                console.error("Save employee error:", error);
+                
+                const oDialog = this.byId("employeeDialog");
+                if (oDialog) {
+                    oDialog.setBusy(false);
+                }
+            }
+        },
+
+        _validateEmployeeData: function(oData) {
+            // Validate required fields
+            return !!(
+                oData.Empid && 
+                oData.firstName && 
+                oData.lastName && 
+                oData.rollOnDate &&
+                oData.SAP
+            );
+        },
+
+        _prepareEmployeePayload: function(oEmployeeData) {
+            // Map frontend model to backend entity structure
+            return {
+                Empid: oEmployeeData.Empid.trim(),
+                FirstName: oEmployeeData.firstName.trim(),
+                LastName: oEmployeeData.lastName.trim(),
+                Location_LocID: oEmployeeData.location ? oEmployeeData.location.trim() : null,
+                CID: oEmployeeData.CID ? oEmployeeData.CID.trim() : "",
+                ProductGroup: oEmployeeData.ProductGroup ? oEmployeeData.ProductGroup.trim() : "",
+                ServiceGroup: oEmployeeData.ServiceGroup ? oEmployeeData.ServiceGroup.trim() : "",
+                Product: oEmployeeData.Product ? oEmployeeData.Product.trim() : "",
+                Employer: oEmployeeData.Position ? oEmployeeData.Position.trim() : "",
+                RollOnDate: oEmployeeData.rollOnDate ? this._formatDate(oEmployeeData.rollOnDate) : null,
+                RollOffDate: oEmployeeData.rollOffDate ? this._formatDate(oEmployeeData.rollOffDate) : null,
+                SAP: parseInt(oEmployeeData.SAP) || 0,
+                NonSAP: parseInt(oEmployeeData.NonSAP) || 0,
+                SAPToday: parseInt(oEmployeeData.SAPToday) || 0,
+                isNewRecord: oEmployeeData.statusNewEmployee || false,
+                ktStarted: oEmployeeData.statusKTStarted || false,
+                Staff_RollOffStatus: oEmployeeData.statusRollOffStarted || false,
+                handoverKtBegun: oEmployeeData.statusHandoverKTBegun || false,
+                IsActiveEntity: false // Create as draft first
+            };
+        },
+
+        _formatDate: function(sDate) {
+            // Ensure date is in correct format for backend
+            if (!sDate) return null;
+            
+            // If it's already a Date object
+            if (sDate instanceof Date) {
+                return sDate.toISOString().split('T')[0];
+            }
+            
+            // If it's a string in yyyy-MM-dd format, return as is
+            if (typeof sDate === 'string' && sDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                return sDate;
+            }
+            
+            // Try to parse and format
+            const oDate = new Date(sDate);
+            if (!isNaN(oDate.getTime())) {
+                return oDate.toISOString().split('T')[0];
+            }
+            
+            return null;
+        },
+
+        _createAndSaveEmployee: function(oModel, oEmployeeData) {
+            return new Promise((resolve, reject) => {
+                const oPayload = this._prepareEmployeePayload(oEmployeeData);
+                
+                console.log("Creating employee with payload:", oPayload);
+                
+                // Store the employee ID for later use
+                let sCreatedEmployeeId = null;
+                
+                // Create the draft entry
+                oModel.create("/EmployeeHeader", oPayload, {
+                    success: function(oCreatedData) {
+                        console.log("Draft created successfully:", oCreatedData);
+                        sCreatedEmployeeId = oCreatedData.ID;
+                        
+                        if (!sCreatedEmployeeId) {
+                            reject(new Error("No ID returned from create operation"));
+                            return;
+                        }
+                        
+                        // Now prepare and activate the draft using POST
+                        this._prepareDraftPost(oModel, sCreatedEmployeeId)
+                            .then(() => {
+                                return this._activateDraftPost(oModel, sCreatedEmployeeId);
+                            })
+                            .then(() => {
+                                console.log("Employee saved successfully");
+                                resolve();
+                            })
+                            .catch((error) => {
+                                console.error("Error in draft prepare/activate:", error);
+                                reject(error);
+                            });
+                            
+                    }.bind(this),
+                    error: function(oError) {
+                        console.error("Create draft error:", oError);
+                        let sErrorMsg = "Failed to create employee entry";
+                        
+                        try {
+                            if (oError.responseText) {
+                                const oErrorResponse = JSON.parse(oError.responseText);
+                                sErrorMsg = oErrorResponse.error?.message?.value || sErrorMsg;
+                            }
+                        } catch (e) {
+                            console.error("Error parsing error response:", e);
+                        }
+                        
+                        reject(new Error(sErrorMsg));
+                    }
+                });
             });
         },
 
-        _validateEmployeeData: function (oData) {
-            return oData.Empid && 
-                   oData.firstName && 
-                   oData.lastName && 
-                   oData.kickOffDate &&
-                   oData.monthsExperience >= 0;
+        _prepareDraftPost: function(oModel, sEmployeeId) {
+            return new Promise((resolve, reject) => {
+                // Use POST to call the bound action
+                const sPath = `/EmployeeHeader(ID=${sEmployeeId},IsActiveEntity=false)/OMTSrv.draftPrepare`;
+                const oPayload = {
+                    SideEffectsQualifier: ""
+                };
+                
+                console.log("Preparing draft for:", sEmployeeId);
+                console.log("POST path:", sPath);
+                
+                jQuery.ajax({
+                    url: oModel.sServiceUrl + sPath,
+                    method: "POST",
+                    data: JSON.stringify(oPayload),
+                    contentType: "application/json",
+                    headers: {
+                        "X-CSRF-Token": oModel.getSecurityToken(),
+                        "Accept": "application/json"
+                    },
+                    success: function(oData) {
+                        console.log("Draft prepared successfully:", oData);
+                        resolve(oData);
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.error("Draft prepare error:", jqXHR.responseText);
+                        reject(new Error("Failed to prepare draft: " + errorThrown));
+                    }
+                });
+            });
         },
 
-        _closeDialog: function () {
-            this._pDialog.then(function (oDialog) {
+        _activateDraftPost: function(oModel, sEmployeeId) {
+            return new Promise((resolve, reject) => {
+                // Use POST to call the bound action
+                const aSelects = [
+                    "Accessibility_AccessID", "CID", "DraftMessages", "Empid", "Employer",
+                    "FirstName", "HasActiveEntity", "HasDraftEntity", "ID", "IsActiveEntity",
+                    "LastName", "Location_LocID", "NonSAP", "Product", "ProductGroup",
+                    "RollOffDate", "RollOffImpact_ROI", "RollOnDate", "SAP", "SAPToday",
+                    "ServiceGroup", "Skill_SkillID", "Staff_ReasonsRemarks",
+                    "Staff_RollOffReasons", "Staff_RollOffStatus", "handoverKtBegun",
+                    "isNewRecord", "ktStarted"
+                ];
+                
+                const sExpand = "Accessibility($select=AccessID,Description)," +
+                               "DraftAdministrativeData($select=DraftIsCreatedByMe,DraftUUID,InProcessByUser)," +
+                               "Location($select=LocDesc,LocID)";
+                
+                const sPath = `/EmployeeHeader(ID=${sEmployeeId},IsActiveEntity=false)/OMTSrv.draftActivate` +
+                             `?$select=${aSelects.join(",")}&$expand=${sExpand}`;
+                
+                console.log("Activating draft for:", sEmployeeId);
+                console.log("POST path:", sPath);
+                
+                jQuery.ajax({
+                    url: oModel.sServiceUrl + sPath,
+                    method: "POST",
+                    data: JSON.stringify({}),
+                    contentType: "application/json",
+                    headers: {
+                        "X-CSRF-Token": oModel.getSecurityToken(),
+                        "Accept": "application/json",
+                        "Prefer": "handling=strict"
+                    },
+                    success: function(oData) {
+                        console.log("Draft activated successfully:", oData);
+                        resolve(oData);
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.error("Draft activate error:", jqXHR.responseText);
+                        
+                        let sErrorMsg = "Failed to save employee";
+                        try {
+                            if (jqXHR.responseText) {
+                                const oErrorResponse = JSON.parse(jqXHR.responseText);
+                                sErrorMsg = oErrorResponse.error?.message?.value || sErrorMsg;
+                            }
+                        } catch (e) {
+                            console.error("Error parsing error response:", e);
+                        }
+                        
+                        reject(new Error(sErrorMsg + ": " + errorThrown));
+                    }
+                });
+            });
+        },
+
+        _closeDialog: function() {
+            const oDialog = this.byId("employeeDialog");
+            if (oDialog) {
                 oDialog.close();
-            });
+            }
         },
 
-        _refreshSmartTable: function () {
-            const oSmartTable = this.byId("employeeSmartTable");
+        _refreshMainView: function() {
+            // Refresh your SmartTable
+            const oSmartTable = this.byId("smartTable"); // Replace with your actual SmartTable ID
             if (oSmartTable) {
                 oSmartTable.rebindTable();
             }
+            
+            // Also refresh the model to ensure data is up-to-date
+            const oModel = this.getView().getModel();
+            if (oModel) {
+                oModel.refresh(true);
+            }
         },
 
-        onCancelEmployee: function () {
-            this._closeDialog();
+        onCancelEmployee: function() {
+            // Optional: Show confirmation dialog if data was entered
+            const oEmployeeModel = this.getView().getModel("employee");
+            const oData = oEmployeeModel.getData();
+            
+            const bHasData = !!(oData.Empid || oData.firstName || oData.lastName);
+            
+            if (bHasData) {
+                MessageBox.confirm("Are you sure you want to cancel? All entered data will be lost.", {
+                    title: "Confirm Cancel",
+                    onClose: function(sAction) {
+                        if (sAction === MessageBox.Action.OK) {
+                            this._closeDialog();
+                        }
+                    }.bind(this)
+                });
+            } else {
+                this._closeDialog();
+            }
         }
     });
 });
