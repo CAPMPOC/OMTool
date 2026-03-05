@@ -329,62 +329,7 @@ module.exports = cds.service.impl(async function () {
         }
     });
     // ==================== AFTER CREATE HANDLER - SBPA ALERT ====================
-    //For Production
-    //     this.after('CREATE', EmployeeHeader, async (data, req) => {
-    //         // Only trigger for actual CREATE (not drafts)
-    //         if (!data || !data.ID) {
-    //             console.log('[SBPA ALERT] No data returned from CREATE, skipping alert');
-    //             return;
-    //         }
-
-    //         console.log(`[SBPA ALERT] New employee created - ID: ${data.ID}, EmpID: ${data.Empid}`);
-
-    //         try {
-    //             // Your Definition ID from SBPA
-    //             const DEFINITION_ID = 'us10.d09d1a89trial.employeeonboardingalert1.newEmployeeAdded';
-
-    //             // Prepare payload matching your SBPA input parameters
-    //             const alertPayload = {
-    //                 definitionId: DEFINITION_ID,
-    //                 context: {
-    //                     Empid: data.Empid || '',
-    //                     FirstName: data.FirstName || '',
-    //                     LastName: data.LastName || '',
-    //                     CID: data.CID || '',
-    //                     Accessibility: data.Accessibility_AccessID || '',
-    //                     Location: data.Location_LocID || '',
-    //                     RollOnDate: data.RollOnDate ? data.RollOnDate.toString() : ''
-    //                 }
-    //             };
-
-    //             console.log('[SBPA ALERT] Payload:', JSON.stringify(alertPayload, null, 2));
-
-    //             // Connect to SBPA destination and trigger workflow
-    //             const sbpaService = await cds.connect.to('SBPA_API');
-
-    //             const response = await sbpaService.send({
-    //                 method: 'POST',
-    //                 path: '/workflow-instances',
-    //                 data: alertPayload,
-    //                 headers: {
-    //                     'Content-Type': 'application/json'
-    //                 }
-    //             });
-
-    //             console.log(`[SBPA ALERT] Workflow triggered successfully. Instance ID: ${response.id}`);
-
-    //         } catch (error) {
-    //             // Log error but don't fail the CREATE operation
-    //             console.error('[SBPA ALERT] Failed to trigger SBPA workflow:', error.message);
-
-    //             if (error.response) {
-    //                 console.error('[SBPA ALERT] Response status:', error.response.status);
-    //                 console.error('[SBPA ALERT] Response data:', JSON.stringify(error.response.data));
-    //             }
-    //         }
-    //     });
-
-    //For Local Testing
+    // For Production
     this.after('CREATE', EmployeeHeader, async (data, req) => {
         // Only trigger for actual CREATE (not drafts)
         if (!data || !data.ID) {
@@ -395,40 +340,12 @@ module.exports = cds.service.impl(async function () {
         console.log(`[SBPA ALERT] New employee created - ID: ${data.ID}, EmpID: ${data.Empid}`);
 
         try {
-            // SBPA Configuration from your service key
-            const SBPA_CONFIG = {
-                apiUrl: 'https://spa-api-gateway-bpi-us-prod.cfapps.us10.hana.ondemand.com/workflow/rest/v1',
-                tokenUrl: 'https://d09d1a89trial.authentication.us10.hana.ondemand.com/oauth/token',
-                clientId: 'sb-04a58ee3-3466-44dc-a5e4-973a571bd78e!b607140|xsuaa!b49390',
-                clientSecret: '1391c26f-09db-4855-9a59-c1ef54029cf8$EzIOl_fyMyJySaanaFNH3V48ZUzUQbKBfpWk-VyjP6U=',
-                definitionId: 'us10.d09d1a89trial.employeeonboardingalert1.newEmployeeAdded'
-            };
+            // Your Definition ID from SBPA
+            const DEFINITION_ID = 'us10.d09d1a89trial.employeeonboardingalert1.newEmployeeAdded';
 
-            // Step 1: Get OAuth token
-            console.log('[SBPA ALERT] Requesting OAuth token...');
-
-            const tokenResponse = await fetch(SBPA_CONFIG.tokenUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'Authorization': 'Basic ' + Buffer.from(`${SBPA_CONFIG.clientId}:${SBPA_CONFIG.clientSecret}`).toString('base64')
-                },
-                body: 'grant_type=client_credentials'
-            });
-
-            if (!tokenResponse.ok) {
-                const errorText = await tokenResponse.text();
-                throw new Error(`Token request failed: ${tokenResponse.status} - ${errorText}`);
-            }
-
-            const tokenData = await tokenResponse.json();
-            const accessToken = tokenData.access_token;
-
-            console.log('[SBPA ALERT] OAuth token obtained successfully');
-
-            // Step 2: Prepare payload matching your SBPA input parameters
+            // Prepare payload matching your SBPA input parameters
             const alertPayload = {
-                definitionId: SBPA_CONFIG.definitionId,
+                definitionId: DEFINITION_ID,
                 context: {
                     Empid: data.Empid || '',
                     FirstName: data.FirstName || '',
@@ -442,29 +359,112 @@ module.exports = cds.service.impl(async function () {
 
             console.log('[SBPA ALERT] Payload:', JSON.stringify(alertPayload, null, 2));
 
-            // Step 3: Trigger SBPA workflow
-            console.log('[SBPA ALERT] Triggering workflow...');
+            // Connect to SBPA destination and trigger workflow
+            const sbpaService = await cds.connect.to('SBPA_API');
 
-            const workflowResponse = await fetch(`${SBPA_CONFIG.apiUrl}/workflow-instances`, {
+            const response = await sbpaService.send({
                 method: 'POST',
+                path: '/workflow-instances',
+                data: alertPayload,
                 headers: {
-                    'Authorization': `Bearer ${accessToken}`,
                     'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(alertPayload)
+                }
             });
 
-            if (!workflowResponse.ok) {
-                const errorText = await workflowResponse.text();
-                throw new Error(`Workflow trigger failed: ${workflowResponse.status} - ${errorText}`);
-            }
-
-            const result = await workflowResponse.json();
-            console.log(`[SBPA ALERT] Workflow triggered successfully! Instance ID: ${result.id}`);
+            console.log(`[SBPA ALERT] Workflow triggered successfully. Instance ID: ${response.id}`);
 
         } catch (error) {
             // Log error but don't fail the CREATE operation
             console.error('[SBPA ALERT] Failed to trigger SBPA workflow:', error.message);
+
+            if (error.response) {
+                console.error('[SBPA ALERT] Response status:', error.response.status);
+                console.error('[SBPA ALERT] Response data:', JSON.stringify(error.response.data));
+            }
         }
     });
+
+    //For Local Testing
+    // this.after('CREATE', EmployeeHeader, async (data, req) => {
+    //     // Only trigger for actual CREATE (not drafts)
+    //     if (!data || !data.ID) {
+    //         console.log('[SBPA ALERT] No data returned from CREATE, skipping alert');
+    //         return;
+    //     }
+
+    //     console.log(`[SBPA ALERT] New employee created - ID: ${data.ID}, EmpID: ${data.Empid}`);
+
+    //     try {
+    //         // SBPA Configuration from your service key
+    //         const SBPA_CONFIG = {
+    //             apiUrl: 'https://spa-api-gateway-bpi-us-prod.cfapps.us10.hana.ondemand.com/workflow/rest/v1',
+    //             tokenUrl: 'https://d09d1a89trial.authentication.us10.hana.ondemand.com/oauth/token',
+    //             clientId: 'sb-04a58ee3-3466-44dc-a5e4-973a571bd78e!b607140|xsuaa!b49390',
+    //             clientSecret: '1391c26f-09db-4855-9a59-c1ef54029cf8$EzIOl_fyMyJySaanaFNH3V48ZUzUQbKBfpWk-VyjP6U=',
+    //             definitionId: 'us10.d09d1a89trial.employeeonboardingalert1.newEmployeeAdded'
+    //         };
+
+    //         // Step 1: Get OAuth token
+    //         console.log('[SBPA ALERT] Requesting OAuth token...');
+
+    //         const tokenResponse = await fetch(SBPA_CONFIG.tokenUrl, {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/x-www-form-urlencoded',
+    //                 'Authorization': 'Basic ' + Buffer.from(`${SBPA_CONFIG.clientId}:${SBPA_CONFIG.clientSecret}`).toString('base64')
+    //             },
+    //             body: 'grant_type=client_credentials'
+    //         });
+
+    //         if (!tokenResponse.ok) {
+    //             const errorText = await tokenResponse.text();
+    //             throw new Error(`Token request failed: ${tokenResponse.status} - ${errorText}`);
+    //         }
+
+    //         const tokenData = await tokenResponse.json();
+    //         const accessToken = tokenData.access_token;
+
+    //         console.log('[SBPA ALERT] OAuth token obtained successfully');
+
+    //         // Step 2: Prepare payload matching your SBPA input parameters
+    //         const alertPayload = {
+    //             definitionId: SBPA_CONFIG.definitionId,
+    //             context: {
+    //                 Empid: data.Empid || '',
+    //                 FirstName: data.FirstName || '',
+    //                 LastName: data.LastName || '',
+    //                 CID: data.CID || '',
+    //                 Accessibility: data.Accessibility_AccessID || '',
+    //                 Location: data.Location_LocID || '',
+    //                 RollOnDate: data.RollOnDate ? data.RollOnDate.toString() : ''
+    //             }
+    //         };
+
+    //         console.log('[SBPA ALERT] Payload:', JSON.stringify(alertPayload, null, 2));
+
+    //         // Step 3: Trigger SBPA workflow
+    //         console.log('[SBPA ALERT] Triggering workflow...');
+
+    //         const workflowResponse = await fetch(`${SBPA_CONFIG.apiUrl}/workflow-instances`, {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Authorization': `Bearer ${accessToken}`,
+    //                 'Content-Type': 'application/json'
+    //             },
+    //             body: JSON.stringify(alertPayload)
+    //         });
+
+    //         if (!workflowResponse.ok) {
+    //             const errorText = await workflowResponse.text();
+    //             throw new Error(`Workflow trigger failed: ${workflowResponse.status} - ${errorText}`);
+    //         }
+
+    //         const result = await workflowResponse.json();
+    //         console.log(`[SBPA ALERT] Workflow triggered successfully! Instance ID: ${result.id}`);
+
+    //     } catch (error) {
+    //         // Log error but don't fail the CREATE operation
+    //         console.error('[SBPA ALERT] Failed to trigger SBPA workflow:', error.message);
+    //     }
+    // });
 });
