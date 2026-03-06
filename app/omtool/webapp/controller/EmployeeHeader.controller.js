@@ -535,25 +535,14 @@ sap.ui.define([
                 
                 console.log("Preparing draft for:", sEmployeeId);
                 console.log("POST path:", sPath);
-                
-                jQuery.ajax({
-                    url: oModel.sServiceUrl + sPath,
-                    method: "POST",
-                    data: JSON.stringify(oPayload),
-                    contentType: "application/json",
-                    headers: {
-                        "X-CSRF-Token": oModel.getSecurityToken(),
-                        "Accept": "application/json"
-                    },
-                    success: function(oData) {
-                        console.log("Draft prepared successfully:", oData);
-                        resolve(oData);
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        console.error("Draft prepare error:", jqXHR.responseText);
-                        reject(new Error("Failed to prepare draft: " + errorThrown));
-                    }
-                });
+
+                this.oODataService.createEntity(sPath, oPayload)
+                    .then((oData) => {
+                        resolve(oData)
+                    })
+                    .catch((oError) => {
+                        reject(oError);
+                    })
             });
         },
 
@@ -580,36 +569,13 @@ sap.ui.define([
                 console.log("Activating draft for:", sEmployeeId);
                 console.log("POST path:", sPath);
                 
-                jQuery.ajax({
-                    url: oModel.sServiceUrl + sPath,
-                    method: "POST",
-                    data: JSON.stringify({}),
-                    contentType: "application/json",
-                    headers: {
-                        "X-CSRF-Token": oModel.getSecurityToken(),
-                        "Accept": "application/json",
-                        "Prefer": "handling=strict"
-                    },
-                    success: function(oData) {
-                        console.log("Draft activated successfully:", oData);
-                        resolve(oData);
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        console.error("Draft activate error:", jqXHR.responseText);
-                        
-                        let sErrorMsg = "Failed to save employee";
-                        try {
-                            if (jqXHR.responseText) {
-                                const oErrorResponse = JSON.parse(jqXHR.responseText);
-                                sErrorMsg = oErrorResponse.error?.message?.value || sErrorMsg;
-                            }
-                        } catch (e) {
-                            console.error("Error parsing error response:", e);
-                        }
-                        
-                        reject(new Error(sErrorMsg + ": " + errorThrown));
-                    }
-                });
+                this.oODataService.createEntity(sPath)
+                    .then((oData) => {
+                        resolve(oData)
+                    })
+                    .catch((oError) => {
+                        reject(oError)
+                    })
             });
         },
 
