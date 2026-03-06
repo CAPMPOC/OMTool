@@ -8,6 +8,26 @@
     <Page id="page" title="{i18n>title}">
         <content>
 
+            <OverflowToolbar id="navigationToolbar" design="Solid" class="sapUiTinyMarginBottom">
+                <SegmentedButton id="navSegmentedButton" selectedKey="employeeMaster">
+                    <items>
+                        <SegmentedButtonItem 
+                            id="employeeMasterBtn" 
+                            icon="sap-icon://employee" 
+                            text="Employee Master" 
+                            key="employeeMaster"
+                            press="onNavigateToEmployeeMaster"/>
+                        <SegmentedButtonItem 
+                            id="reportsBtn" 
+                            icon="sap-icon://bar-chart" 
+                            text="Reports" 
+                            key="reports"
+                            press="onNavigateToReports"/>
+                    </items>
+                </SegmentedButton>
+                <ToolbarSpacer id="navToolbarSpacer"/>
+            </OverflowToolbar>
+
             <core:Fragment fragmentName="com.sap.omtool.omtool.view.fragments.FilterBar" type="XML"/>
             
             <smartTable:SmartTable

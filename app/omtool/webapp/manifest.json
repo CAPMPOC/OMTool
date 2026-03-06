@@ -25,13 +25,13 @@
         }
       },
       "mainService": {
-            "uri": "/odata/v2/omtsrv/",
-            "type": "OData",
-            "settings": {
-                "odataVersion": "2.0",
-                "localUri": "localService/metadata.xml"
-            }
+        "uri": "/odata/v2/omtsrv/",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "2.0",
+          "localUri": "localService/metadata.xml"
         }
+      }
     }
   },
   "sap.ui": {
@@ -102,16 +102,25 @@
       "routes": [
         {
           "name": "RouteEmployeeHeader",
-          "pattern": ":?query:",
+          "pattern": "",
           "target": [
             "TargetEmployeeHeader"
           ]
+        },
+        {
+          "pattern": "reports",
+          "name": "Reports",
+          "target": "TargetReports"
         }
       ],
       "targets": {
         "TargetEmployeeHeader": {
           "id": "EmployeeHeader",
           "name": "EmployeeHeader"
+        },
+        "TargetReports": {
+          "id": "Reports",
+          "name": "Reports"
         }
       }
     },

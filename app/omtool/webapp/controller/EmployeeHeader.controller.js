@@ -23,6 +23,17 @@ sap.ui.define([
 
             // Initialize property to store selected location key
             this._selectedLocationKey = "";
+
+            var oRouter = this.getOwnerComponent().getRouter();
+            oRouter.getRoute("RouteEmployeeHeader").attachPatternMatched(this._onRouteMatched, this);
+        },
+
+        _onRouteMatched: function () {
+            // Set the correct button as selected when route is matched
+            var oSegmentedButton = this.byId("navSegmentedButton");
+            if (oSegmentedButton) {
+                oSegmentedButton.setSelectedKey("employeeMaster");
+            }
         },
 
         /**
@@ -619,6 +630,19 @@ sap.ui.define([
             } else {
                 this._closeDialog();
             }
-        }
+        },
+
+        onNavigateToReports: function () {
+            var oRouter = this.getOwnerComponent().getRouter();
+            oRouter.navTo("Reports");
+        },
+
+        onNavigateToEmployeeMaster: function () {
+            // Already on Employee Master page
+            var oSegmentedButton = this.byId("navSegmentedButton");
+            if (oSegmentedButton) {
+                oSegmentedButton.setSelectedKey("employeeMaster");
+            }
+        },
     });
 });
