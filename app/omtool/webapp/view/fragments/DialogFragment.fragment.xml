@@ -24,7 +24,7 @@
                     <Input 
                         id="inputEmployeeId" 
                         value="{employee>/Empid}"
-                        width="80%"
+                        width="98%"
                         placeholder=""/>
                 </VBox>
                 
@@ -74,6 +74,19 @@
                         text="Assignment" 
                         level="H4"
                         class="sapUiSmallMarginBottom sapUiSmallMarginTop"/>
+
+                         <!-- Employer Name -->
+                <VBox
+                    id="vboxEmployerName">
+                    <Label
+                        id="lblEmployerName"
+                        text="Employer Name" />
+                    <Input
+                        id="inputEmployerName"
+                        value="{employee>/Employer}"
+                        width="98%"
+                        placeholder="" />
+                </VBox>
                     <HBox>
                   <VBox id="vboxProductGroup" width="48%" class="sapUiSmallMarginEnd">
                     <Label id="lblProductGroup" text="ProductGroup"/>
@@ -84,7 +97,7 @@
                         placeholder=""/>
                 </VBox>
 
-                <VBox id="vboxServiceGroup" width="48%">
+                <VBox id="vboxServiceGroup" width="48%" class="sapUiSmallMarginEnd">
                     <Label id="lblServiceGroup" text="Service Group"/>
                     <Input 
                         id="inputServiceGroup" 
@@ -95,7 +108,7 @@
                 </HBox>
 
                 <HBox id="hboxProduct">
-                <VBox id="vboxProduct"  width="48%"  class="sapUiSmallMarginEnd">
+                <VBox id="vboxProduct"  width="48%" class="sapUiSmallMarginEnd">
                     <Label id="lblProduct" text="Product"/>
                     <Input 
                         id="inputProduct" 
@@ -104,11 +117,11 @@
                         placeholder=""/>
                 </VBox>   
 
-                <VBox id="vboxPosition"  width="48%">
-                    <Label id="lblPosition" text="Position"/>
+                <VBox id="vboxAccessibility"  width="48%" class="sapUiSmallMarginEnd">
+                    <Label id="lblAccessibility" text="Accessibility"/>
                     <Input 
-                        id="inputPosition" 
-                        value="{employee>/Position}"
+                        id="inputAccessibility" 
+                        value="{employee>/Accessibility}"
                         width="100%"
                         placeholder=""/>
                 </VBox>      
@@ -130,7 +143,7 @@
                     </VBox>
                     
                     <!-- Roll-off Date -->
-                    <VBox id="vboxRollOffDate" width="48%">
+                    <VBox id="vboxRollOffDate" width="48%" class="sapUiSmallMarginEnd">
                         <Label id="lblRollOffDate" text="Roll-off Date"/>
                         <DatePicker
                             id="dpRollOffDate"
@@ -142,37 +155,73 @@
                     </VBox>
                 </HBox>
                 
-                <!-- Months Experience -->
+                <!-- EXPERIENCE SECTION -->
+                <Title
+                    id="titleExperience"
+                    text="Experience"
+                    level="H4"
+                    class="sapUiSmallMarginBottom sapUiSmallMarginTop" />
                 
-                <VBox id="vboxExperience" class="sapUiSmallMarginTop">
-                <Title 
-                        id="titleExperience" 
-                        text="Experience" 
-                        level="H4"
-                        class="sapUiSmallMarginBottom"/>
+                <!-- SAP and Non-SAP Experience -->
+                <HBox id="hboxSAPExperience">
+                    <VBox
+                        id="vboxSAPExperience"
+                        width="30%"
+                        class="sapUiSmallMarginEnd">
+                        <Label
+                            id="lblSAPExperience"
+                            text="SAP Experience"
+                            required="true" />
+                        <Input
+                            id="sapExperience"
+                            value="{employee>/SAP}"
+                            width="100%" />
+                    </VBox>
                     
-                  <VBox id="vboxSAPExperience" width="48%" class="sapUiSmallMarginEnd">
-                    <Label id="lblSAPExperience" text="SAP Experience" required="true"/>
-                    <Input  id="sapExperience" value="{employee>/SAP}"/>
-        </VBox>
-                </VBox>
-                <VBox id="vboxNonSAPExp"  width="48%">
-                    <Label id="lblNonSAPExp" text="Non-SAP Experience"/>
-                    <Input 
-                        id="inputNonSAPExp" 
-                        value="{employee>/NonSAP}"
-                        width="100%"
-                        placeholder=""/>
-                </VBox> 
+                    <VBox
+                        id="vboxNonSAPExp"
+                        width="30%"
+                        class="sapUiSmallMarginEnd">
+                        <Label
+                            id="lblNonSAPExp"
+                            text="Non-SAP Experience" />
+                        <Input
+                            id="inputNonSAPExp"
+                            value="{employee>/NonSAP}"
+                            width="100%"  />
+                    </VBox>
 
-                <VBox id="vboxTotalExp"  width="48%">
-                    <Label id="lblTotalExp" text="Total Experience"/>
-                    <Input 
-                        id="inputTotalExp" 
-                        value="{employee>/SAPToday}"
-                        width="100%"
-                        placeholder=""/>
-                </VBox> 
+                    <VBox
+                        id="vboxTotalExp"
+                        width="30%"
+                        class="sapUiSmallMarginEnd">
+                        <Label
+                            id="lblTotalExp"
+                            text="Total Experience" />
+                        <Input
+                            id="inputTotalExp"
+                            value="{employee>/SAPToday}"
+                            width="100%"
+                            placeholder=""  enabled="false"/>
+                    </VBox>
+                </HBox>
+                
+                <!-- Total Experience and Skills -->
+                <!-- <HBox id="hboxTotalExpSkills"> -->
+                    
+                    
+                    <VBox
+                        id="vboxEmpSkill">
+                        <Label
+                            id="lblEmpSkill"
+                            text="Employee Skills" />
+                        <Input
+                            id="inputEmpSkill"
+                            value="{employee>/Skill_SkillID}"
+                            width="98%"
+                            placeholder="" />
+                    </VBox>
+                <!-- </HBox> -->
                 
                 
                 <!-- Status Tracking Section -->
@@ -182,60 +231,36 @@
                     <Title 
                         id="titleStatusTracking" 
                         text="Status Tracking" 
-                        level="H4"
-                        class="sapUiSmallMarginBottom"/>
-                    
-                    <!-- New Employee -->
-                    <HBox 
-                        id="hboxNewEmployee" 
-                        justifyContent="SpaceBetween" 
+                        level="H4"/>
+                    <HBox id="hboxStatusSwitches">
+                    <HBox
+                        id="hboxRollOffStarted"
+                        justifyContent="Start"
                         alignItems="Center"
-                        width="100%"
+                        width="50%"
                         class="sapUiSmallMarginTop">
-                        <Text id="txtNewEmployee" text="New Employee"/>
-                        <Switch 
-                            id="switchNewEmployee" 
-                            state="{employee>/statusNewEmployee}"/>
+                        <Text
+                            id="txtRollOffStarted"
+                            text="Roll-off Started" />
+                        <Switch
+                            id="switchRollOffStarted"
+                            state="true"  customTextOn="Yes" customTextOff="No" />
                     </HBox>
                     
-                    <!-- KT Started -->
-                    <HBox 
-                        id="hboxKTStarted" 
-                        justifyContent="SpaceBetween" 
+                    <HBox
+                        id="hboxHandoverKT"
+                        justifyContent="Start"
                         alignItems="Center"
-                        width="100%"
+                        width="50%"
                         class="sapUiSmallMarginTop">
-                        <Text id="txtKTStarted" text="KT Started"/>
-                        <Switch 
-                            id="switchKTStarted" 
-                            state="{employee>/statusKTStarted}"/>
+                        <Text
+                            id="txtHandoverKT"
+                            text="Handover/KT Begun" />
+                        <Switch
+                            id="switchHandoverKT"
+                            state="true"  customTextOn="Yes" customTextOff="No" />
                     </HBox>
-                    
-                    <!-- Roll-off Started -->
-                    <HBox 
-                        id="hboxRollOffStarted" 
-                        justifyContent="SpaceBetween" 
-                        alignItems="Center"
-                        width="100%"
-                        class="sapUiSmallMarginTop">
-                        <Text id="txtRollOffStarted" text="Roll-off Started"/>
-                        <Switch 
-                            id="switchRollOffStarted" 
-                            state="{employee>/statusRollOffStarted}"/>
-                    </HBox>
-                    
-                    <!-- Handover/KT Begun -->
-                    <HBox 
-                        id="hboxHandoverKT" 
-                        justifyContent="SpaceBetween" 
-                        alignItems="Center"
-                        width="100%"
-                        class="sapUiSmallMarginTop">
-                        <Text id="txtHandoverKT" text="Handover/KT Begun"/>
-                        <Switch 
-                            id="switchHandoverKT" 
-                            state="{employee>/statusHandoverKTBegun}"/>
-                    </HBox>
+                </HBox>
                     
                 </VBox>
                 
