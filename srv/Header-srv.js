@@ -330,57 +330,57 @@ module.exports = cds.service.impl(async function () {
     });
     // ==================== AFTER CREATE HANDLER - SBPA ALERT ====================
     // For Production
-        this.after('CREATE', EmployeeHeader, async (data, req) => {
-            // Only trigger for actual CREATE (not drafts)
-            if (!data || !data.ID) {
-                console.log('[SBPA ALERT] No data returned from CREATE, skipping alert');
-                return;
-            }
+    // this.after('CREATE', EmployeeHeader, async (data, req) => {
+    //     // Only trigger for actual CREATE (not drafts)
+    //     if (!data || !data.ID) {
+    //         console.log('[SBPA ALERT] No data returned from CREATE, skipping alert');
+    //         return;
+    //     }
 
-            console.log(`[SBPA ALERT] New employee created - ID: ${data.ID}, EmpID: ${data.Empid}`);
+    //     console.log(`[SBPA ALERT] New employee created - ID: ${data.ID}, EmpID: ${data.Empid}`);
 
-            try {
-                // Your Definition ID from SBPA
-                const DEFINITION_ID = 'us10.d09d1a89trial.employeeonboardingalert1.newEmployeeAdded';
+    //     try {
+    //         // Your Definition ID from SBPA
+    //         const DEFINITION_ID = 'us10.d09d1a89trial.employeeonboardingalert1.newEmployeeAdded';
 
-                // Prepare payload matching your SBPA input parameters
-                const alertPayload = {
-                    definitionId: DEFINITION_ID,
-                    context: {
-                        Empid: data.Empid || '',
-                        FirstName: data.FirstName || '',
-                        LastName: data.LastName || '',
-                        CID: data.CID || '',
-                        Accessibility: data.Accessibility_AccessID || '',
-                        Location: data.Location_LocID || '',
-                        RollOnDate: data.RollOnDate ? data.RollOnDate.toString() : ''
-                    }
-                };
+    //         // Prepare payload matching your SBPA input parameters
+    //         const alertPayload = {
+    //             definitionId: DEFINITION_ID,
+    //             context: {
+    //                 Empid: data.Empid || '',
+    //                 FirstName: data.FirstName || '',
+    //                 LastName: data.LastName || '',
+    //                 CID: data.CID || '',
+    //                 Accessibility: data.Accessibility_AccessID || '',
+    //                 Location: data.Location_LocID || '',
+    //                 RollOnDate: data.RollOnDate ? data.RollOnDate.toString() : ''
+    //             }
+    //         };
 
-                console.log('[SBPA ALERT] Payload:', JSON.stringify(alertPayload, null, 2));
+    //         console.log('[SBPA ALERT] Payload:', JSON.stringify(alertPayload, null, 2));
 
-                // Connect to SBPA destination and trigger workflow
-                const sbpaService = await cds.connect.to('SBPA_API');
+    //         // Connect to SBPA destination and trigger workflow
+    //         const sbpaService = await cds.connect.to('SBPA_API');
 
-                const response = await sbpaService.send({
-                    method: 'POST',
-                    path: '/workflow-instances',
-                    data: alertPayload,
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
+    //         const response = await sbpaService.send({
+    //             method: 'POST',
+    //             path: '/workflow-instances',
+    //             data: alertPayload,
+    //             headers: {
+    //                 'Content-Type': 'application/json'
+    //             }
+    //         });
 
-                console.log(`[SBPA ALERT] Workflow triggered successfully. Instance ID: ${response.id}`);
+    //         console.log(`[SBPA ALERT] Workflow triggered successfully. Instance ID: ${response.id}`);
 
-            } catch (error) {
-                // Log error but don't fail the CREATE operation
-                console.error('[SBPA ALERT] Failed to trigger SBPA workflow:', error.message);
+    //     } catch (error) {
+    //         // Log error but don't fail the CREATE operation
+    //         console.error('[SBPA ALERT] Failed to trigger SBPA workflow:', error.message);
 
-                if (error.response) {
-                    console.error('[SBPA ALERT] Response status:', error.response.status);
-                    console.error('[SBPA ALERT] Response data:', JSON.stringify(error.response.data));
-                }
-            }
-        });
+    //         if (error.response) {
+    //             console.error('[SBPA ALERT] Response status:', error.response.status);
+    //             console.error('[SBPA ALERT] Response data:', JSON.stringify(error.response.data));
+    //         }
+    //     }
+    // });
 });
