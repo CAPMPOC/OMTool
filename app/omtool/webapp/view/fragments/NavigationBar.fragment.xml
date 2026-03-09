@@ -1,0 +1,23 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+    
+    <OverflowToolbar id="navigationToolbar" design="Solid" class="sapUiTinyMarginBottom">
+        <SegmentedButton id="navSegmentedButton" selectedKey="employeeMaster" selectionChange="onSegmentedButtonChange">
+            <items>
+                <SegmentedButtonItem 
+                    id="employeeMasterBtn" 
+                    icon="sap-icon://employee" 
+                    text="Employee Master" 
+                    key="employeeMaster"/>
+                <SegmentedButtonItem 
+                    id="reportsBtn" 
+                    icon="sap-icon://bar-chart" 
+                    text="Reports" 
+                    key="reports"/>
+            </items>
+        </SegmentedButton>
+        <ToolbarSpacer id="navToolbarSpacer"/>
+    </OverflowToolbar>
+    
+</core:FragmentDefinition>

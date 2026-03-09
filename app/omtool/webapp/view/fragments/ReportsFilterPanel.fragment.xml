@@ -1,0 +1,110 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+    
+    <Panel 
+        id="filterPanel" 
+        headerText="Reports" 
+        expandable="false" 
+        expanded="true"
+        class="sapUiResponsiveMargin">
+        
+        <content>
+            <Text text="{reportData>/totalEmployees} employee(s) matching filters" 
+                class="sapUiSmallMarginBegin sapUiTinyMarginTop"/>
+            
+            <OverflowToolbar id="filterToolbar" design="Transparent">
+                <content>
+                    <!-- Experience Filter -->
+                    <Label text="Experience" labelFor="experienceFilter" class="sapUiTinyMarginBegin"/>
+                    <ComboBox 
+                        id="experienceFilter" 
+                        selectedKey="All" 
+                        width="150px"
+                        change="onFilterChange">
+                        <items>
+                            <core:Item key="All" text="All"/>
+                        </items>
+                    </ComboBox>
+
+                    <!-- New Employee Filter -->
+                    <Label text="New Employee" labelFor="newEmployeeFilter" class="sapUiSmallMarginBegin"/>
+                    <ComboBox 
+                        id="newEmployeeFilter" 
+                        selectedKey="All" 
+                        width="150px"
+                        change="onFilterChange">
+                        <items>
+                            <core:Item key="All" text="All"/>
+                        </items>
+                    </ComboBox>
+
+                    <!-- KT Started Filter -->
+                    <Label text="KT Started" labelFor="ktStartedFilter" class="sapUiSmallMarginBegin"/>
+                    <ComboBox 
+                        id="ktStartedFilter" 
+                        selectedKey="All" 
+                        width="150px"
+                        change="onFilterChange">
+                        <items>
+                            <core:Item key="All" text="All"/>
+                        </items>
+                    </ComboBox>
+
+                    <!-- Roll-off Started Filter -->
+                    <Label text="Roll-off Started" labelFor="rolloffStartedFilter" class="sapUiSmallMarginBegin"/>
+                    <ComboBox 
+                        id="rolloffStartedFilter" 
+                        selectedKey="All" 
+                        width="150px"
+                        change="onFilterChange">
+                        <items>
+                            <core:Item key="All" text="All"/>
+                        </items>
+                    </ComboBox>
+
+                    <!-- Handover/KT Filter -->
+                    <Label text="Handover/KT" labelFor="handoverKTFilter" class="sapUiSmallMarginBegin"/>
+                    <ComboBox 
+                        id="handoverKTFilter" 
+                        selectedKey="All" 
+                        width="150px"
+                        change="onFilterChange">
+                        <items>
+                            <core:Item key="All" text="All"/>
+                        </items>
+                    </ComboBox>
+
+                    <!-- Kick-off From Date -->
+                    <Label text="Kick-off From" labelFor="kickoffFromDate" class="sapUiSmallMarginBegin"/>
+                    <DatePicker 
+                        id="kickoffFromDate" 
+                        placeholder="mm/dd/yyyy"
+                        width="150px"
+                        change="onFilterChange"/>
+
+                    <!-- Kick-off To Date -->
+                    <Label text="Kick-off To" labelFor="kickoffToDate" class="sapUiSmallMarginBegin"/>
+                    <DatePicker 
+                        id="kickoffToDate" 
+                        placeholder="mm/dd/yyyy"
+                        width="150px"
+                        change="onFilterChange"/>
+
+                    <!-- Roll-off Date Filter -->
+                    <Label text="Roll-off Date" labelFor="rolloffDateFilter" class="sapUiSmallMarginBegin"/>
+                    <ComboBox 
+                        id="rolloffDateFilter" 
+                        selectedKey="All" 
+                        width="150px"
+                        change="onFilterChange">
+                        <items>
+                            <core:Item key="All" text="All"/>
+                        </items>
+                    </ComboBox>
+                </content>
+            </OverflowToolbar>
+        </content>
+    </Panel>
+    
+</core:FragmentDefinition>

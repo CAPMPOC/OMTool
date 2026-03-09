@@ -1,0 +1,44 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:smartTable="sap.ui.comp.smarttable">
+    
+    <VBox id="employeeMasterSection" visible="{viewModel>/showEmployeeMaster}">
+        
+        <!-- Filter Bar Fragment -->
+        <core:Fragment fragmentName="com.sap.omtool.omtool.view.fragments.FilterBar" type="XML"/>
+        
+        <!-- Smart Table -->
+        <smartTable:SmartTable
+            id="smartTable"
+            entitySet="EmployeeHeader"
+            smartFilterId="smartFilterBar"
+            tableType="ResponsiveTable"
+            useExportToExcel="true"
+            useVariantManagement="true"
+            useTablePersonalisation="true"
+            header="Employee Data"
+            showRowCount="true"
+            persistencyKey="EmployeeHeaderSmartTable"
+            enableAutoBinding="true"
+            demandPopin="true"
+            class="sapUiResponsiveContentPadding">
+            
+            <smartTable:customToolbar>
+                <OverflowToolbar id="_toolBar" design="Transparent">
+                    <ToolbarSpacer id="IdToolBar"/>
+                    <Button 
+                        id="_addEmpBtn" 
+                        class="sapUiSmallMargin" 
+                        icon="sap-icon://add-employee" 
+                        type="Default"
+                        text="Add Employee" 
+                        press="onAddEmployee"/>
+                </OverflowToolbar>
+            </smartTable:customToolbar>
+            
+        </smartTable:SmartTable>
+        
+    </VBox>
+    
+</core:FragmentDefinition>
