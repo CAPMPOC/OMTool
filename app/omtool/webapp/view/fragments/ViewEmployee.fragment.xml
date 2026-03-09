@@ -6,7 +6,7 @@
 
     <Dialog
         id="viewEmployeeView"
-        title="View viewEmployee"
+        title="View Employee"
         contentWidth="500px"
         contentHeight="auto"
         resizable="false"
@@ -20,10 +20,10 @@
                         class="sapUiSmallMarginBottom"/>
                 <!-- viewEmployee ID -->
                 <VBox class="sapUiSmallMarginBottom">
-                    <Label text="viewEmployee ID" required="true"/>
+                    <Label text="Employee ID" required="true"/>
                     <Input value="{viewEmployee>/Empid}"
                         width="98%"
-                        placeholder=""/>
+                        placeholder="" enabled="false"/>
                 </VBox>
                 
                 <HBox >
@@ -31,25 +31,25 @@
                     <Label text="First Name" required="true"/>
                     <Input value="{viewEmployee>/firstName}"
                         width="100%"
-                        placeholder=""/>
+                        placeholder="" enabled="false"/>
                 </VBox>
                 <VBox class="sapUiSmallMarginEnd" width="48%">
                     <Label text="Last Name" required="true"/>
                     <Input
                         value="{viewEmployee>/lastName}"
                         width="100%"
-                        placeholder=""/>
+                        placeholder="" enabled="false"/>
                 </VBox>
                 </HBox>
                 
                 <!-- Address -->
                 <HBox >
                 <VBox width="48%" class="sapUiSmallMarginEnd">
-                    <Label text="viewEmployee Location"/>
+                    <Label text="Location"/>
                     <Input
                         value="{viewEmployee>/location}"
                         width="100%"
-                        placeholder=""/>
+                        placeholder="" enabled="false"/>
                 </VBox>
 
                 <VBox width="48%" class="sapUiSmallMarginEnd">
@@ -57,7 +57,7 @@
                     <Input
                         value="{viewEmployee>/CID}"
                         width="100%"
-                        placeholder=""/>
+                        placeholder="" enabled="false"/>
                 </VBox>
                 </HBox>
                 
@@ -74,7 +74,7 @@
                     <Input
                         value="{viewEmployee>/Employer}"
                         width="98%"
-                        placeholder="" />
+                        placeholder="" enabled="false"/>
                 </VBox>
                     <HBox>
                   <VBox width="48%" class="sapUiSmallMarginEnd">
@@ -82,14 +82,14 @@
                     <Input 
                         value="{viewEmployee>/ProductGroup}"
                         width="100%"
-                        placeholder=""/>
+                        placeholder="" enabled="false"/>
                 </VBox>
 
                 <VBox width="48%" class="sapUiSmallMarginEnd">
                     <Label text="Service Group"/>
                     <Input value="{viewEmployee>/ServiceGroup}"
                         width="100%"
-                        placeholder=""/>
+                        placeholder="" enabled="false"/>
                 </VBox>
                 </HBox>
 
@@ -99,14 +99,14 @@
                     <Input 
                         value="{viewEmployee>/Product}"
                         width="100%"
-                        placeholder=""/>
+                        placeholder="" enabled="false"/>
                 </VBox>   
 
                 <VBox  width="48%" class="sapUiSmallMarginEnd">
                     <Label text="Accessibility"/>
                     <Input value="{viewEmployee>/Accessibility}"
                         width="100%"
-                        placeholder=""/>
+                        placeholder="" enabled="false"/>
                 </VBox>      
                 </HBox>
                 <HBox class="sapUiSmallMarginTop">
@@ -120,7 +120,7 @@
                             displayFormat="MM/dd/yyyy"
                             width="100%"
                             placeholder="mm/dd/yyyy"
-                            />
+                            editable="false"/>
                     </VBox>
                     
                     <!-- Roll-off Date -->
@@ -130,7 +130,7 @@
                             valueFormat="yyyy-MM-dd"
                             displayFormat="MM/dd/yyyy"
                             width="100%"
-                            placeholder="mm/dd/yyyy"/>
+                            placeholder="mm/dd/yyyy" editable="false"/>
                     </VBox>
                 </HBox>
                 
@@ -146,7 +146,7 @@
                         <Label text="SAP Experience"
                             required="true" />
                         <Input value="{viewEmployee>/SAP}"
-                            width="100%" />
+                            width="100%" enabled="false"/>
                     </VBox>
                     
                     <VBox width="30%"
@@ -155,7 +155,7 @@
                             text="Non-SAP Experience" />
                         <Input id="inputNonSAPExp"
                             value="{viewEmployee>/NonSAP}"
-                            width="100%"  />
+                            width="100%" enabled="false" />
                     </VBox>
 
                     <VBox width="30%"
@@ -175,7 +175,7 @@
                         <Label text="viewEmployee Skills" />
                         <Input value="{viewEmployee>/Skill_SkillID}"
                             width="98%"
-                            placeholder="" />
+                            placeholder="" enabled="false"/>
                     </VBox>
                 <!-- </HBox> -->
                 
@@ -191,17 +191,17 @@
                         alignItems="Center"
                         width="50%"
                         class="sapUiSmallMarginTop">
-                        <Text text="Roll-off Started" />
+                        <Text text="New Employee" />
                         <Switch
-                            state="true"  customTextOn="Yes" customTextOff="No" />
+                            state="true"  customTextOn="Yes" customTextOff="No" enabled="false"/>
                     </HBox>
                     
                     <HBox justifyContent="Start"
                         alignItems="Center"
                         width="50%"
                         class="sapUiSmallMarginTop">
-                        <Text text="Handover/KT Begun" />
-                        <Switch state="true"  customTextOn="Yes" customTextOff="No" />
+                        <Text text="Onboarding KT Begun" />
+                        <Switch state="true"  customTextOn="Yes" customTextOff="No" enabled="false"/>
                     </HBox>
                 </HBox>
                     

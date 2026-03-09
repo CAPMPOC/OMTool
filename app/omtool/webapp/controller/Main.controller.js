@@ -717,7 +717,7 @@ sap.ui.define([
             }
         },
 
-        onCloseEmployeeDetail: function () {
+        onCloseviewEmployeeDetail: function () {
             if (this._oEmployeeDetailDialog) {
                 this._oEmployeeDetailDialog.close();
             }

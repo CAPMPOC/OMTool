@@ -151,7 +151,7 @@
                             valueFormat="yyyy-MM-dd"
                             displayFormat="MM/dd/yyyy"
                             width="100%"
-                            placeholder="mm/dd/yyyy"/>
+                            placeholder="mm/dd/yyyy" editable="false"/>
                     </VBox>
                 </HBox>
                 
@@ -239,7 +239,7 @@
                         class="sapUiSmallMarginTop">
                         <Text
                             id="txtRollOffStarted"
-                            text="Roll-off Started" />
+                            text="New Employee" />
                         <Switch
                             id="switchRollOffStarted"
                             state="true"  customTextOn="Yes" customTextOff="No" />
@@ -253,7 +253,7 @@
                         class="sapUiSmallMarginTop">
                         <Text
                             id="txtHandoverKT"
-                            text="Handover/KT Begun" />
+                            text="Onboarding KT Begun" />
                         <Switch
                             id="switchHandoverKT"
                             state="true"  customTextOn="Yes" customTextOff="No" />
