@@ -412,6 +412,61 @@ sap.ui.define([
             }
         },
 
+        onViewEmployee: function(oEvent) {
+            var oButton = oEvent.getSource();
+            var oContext = oButton.getBindingContext();
+            
+            if (!oContext) {
+                MessageToast.show("No employee data available");
+                return;
+            }
+            
+            // Get the employee data from the context
+            var oEmployeeData = oContext.getObject();
+            
+            console.log("Employee Data:", oEmployeeData); // Debug log
+            
+            // Create a JSON model with the employee data
+            var oViewModel = new sap.ui.model.json.JSONModel(oEmployeeData);
+            
+            var oView = this.getView();
+            
+            if (!this._oEmployeeDetailDialog) {
+                Fragment.load({
+                    id: oView.getId(),
+                    name: "com.sap.omtool.omtool.view.fragments.ViewEmployee",
+                    controller: this
+                }).then(function(oDialog) {
+                    this._oEmployeeDetailDialog = oDialog;
+                    oView.addDependent(this._oEmployeeDetailDialog);
+                    
+                    // Set the viewEmployee model to the dialog
+                    this._oEmployeeDetailDialog.setModel(oViewModel, "viewEmployee");
+                    
+                    this._oEmployeeDetailDialog.open();
+                }.bind(this));
+            } else {
+                // Update the viewEmployee model with new data
+                this._oEmployeeDetailDialog.setModel(oViewModel, "viewEmployee");
+                this._oEmployeeDetailDialog.open();
+            }
+        },
+
+        onCloseEmployeeDetail: function() {
+            if (this._oEmployeeDetailDialog) {
+                this._oEmployeeDetailDialog.close();
+            }
+        },
+
+        // Cleanup when view is destroyed
+        onExit: function() {
+            if (this._oEmployeeDetailDialog) {
+                this._oEmployeeDetailDialog.destroy();
+            }
+        },
+
+    
+
         _validateEmployeeData: function(oData) {
             // Validate required fields
             return !!(

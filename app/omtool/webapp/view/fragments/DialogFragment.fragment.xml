@@ -32,7 +32,6 @@
                 <VBox id="vboxFirstName" class="sapUiSmallMarginEnd" width="48%">
                     <Label id="lblFirstName" text="First Name" required="true"/>
                     <Input 
-                        id="inputFirstName" 
                         value="{employee>/firstName}"
                         width="100%"
                         placeholder=""/>
