@@ -29,7 +29,7 @@
                 </VBox>
                 
                 <HBox id="hboxNames">
-                <VBox id="vboxFirstName" class="sapUiSmallMarginEnd" width="48%">
+                <VBox id="vboxFirstName" class="sapUiSmallMarginEnd sapUiSmallMarginBottom" width="48%">
                     <Label id="lblFirstName" text="First Name" required="true"/>
                     <Input 
                         id="inputFirstName" 
@@ -37,7 +37,7 @@
                         width="100%"
                         placeholder=""/>
                 </VBox>
-                <VBox id="vboxLastName" class="sapUiSmallMarginEnd" width="48%">
+                <VBox id="vboxLastName" class="sapUiSmallMarginEnd sapUiSmallMarginBottom" width="48%">
                     <Label id="lblLastName" text="Last Name" required="true"/>
                     <Input 
                         id="inputLastName" 
@@ -83,16 +83,18 @@
                         text="Employer Name" />
                     <Input
                         id="inputEmployerName"
+                        class="sapUiSmallMarginBottom"
                         value="{employee>/Employer}"
                         width="98%"
                         placeholder="" />
                 </VBox>
                     <HBox>
                   <VBox id="vboxProductGroup" width="48%" class="sapUiSmallMarginEnd">
-                    <Label id="lblProductGroup" text="ProductGroup"/>
+                    <Label id="lblProductGroup" text="Product Group"/>
                     <Input 
                         id="inputProductGroup" 
-                        value="{employee>/ProductGroup}"
+                        class="sapUiSmallMarginBottom"
+                        value="{employee>/Product Group}"
                         width="100%"
                         placeholder=""/>
                 </VBox>
@@ -163,7 +165,7 @@
                     class="sapUiSmallMarginBottom sapUiSmallMarginTop" />
                 
                 <!-- SAP and Non-SAP Experience -->
-                <HBox id="hboxSAPExperience">
+                <HBox id="hboxSAPExperience" class="sapUiSmallMarginBottom">
                     <VBox
                         id="vboxSAPExperience"
                         width="30%"

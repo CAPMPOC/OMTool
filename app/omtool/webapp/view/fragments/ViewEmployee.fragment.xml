@@ -26,7 +26,7 @@
                         placeholder="" enabled="false"/>
                 </VBox>
                 
-                <HBox >
+                <HBox class="sapUiSmallMarginBottom">
                 <VBox class="sapUiSmallMarginEnd" width="48%">
                     <Label text="First Name" required="true"/>
                     <Input value="{viewEmployee>/firstName}"
@@ -71,23 +71,23 @@
                 <VBox>
                     <Label
                         text="Employer Name" />
-                    <Input
+                    <Input class="sapUiSmallMarginBottom"
                         value="{viewEmployee>/Employer}"
                         width="98%"
                         placeholder="" enabled="false"/>
                 </VBox>
-                    <HBox>
+                    <HBox class="sapUiSmallMarginBottom">
                   <VBox width="48%" class="sapUiSmallMarginEnd">
                     <Label text="ProductGroup"/>
                     <Input 
-                        value="{viewEmployee>/ProductGroup}"
+                        value="{viewEmployee>/Product Group}"
                         width="100%"
                         placeholder="" enabled="false"/>
                 </VBox>
 
                 <VBox width="48%" class="sapUiSmallMarginEnd">
                     <Label text="Service Group"/>
-                    <Input value="{viewEmployee>/ServiceGroup}"
+                    <Input value="{viewEmployee>/Service Group}"
                         width="100%"
                         placeholder="" enabled="false"/>
                 </VBox>
@@ -140,7 +140,7 @@
                     class="sapUiSmallMarginBottom sapUiSmallMarginTop" />
                 
                 <!-- SAP and Non-SAP Experience -->
-                <HBox>
+                <HBox class="sapUiSmallMarginBottom">
                     <VBox width="30%"
                         class="sapUiSmallMarginEnd">
                         <Label text="SAP Experience"
@@ -172,7 +172,7 @@
                     
                     
                     <VBox>
-                        <Label text="viewEmployee Skills" />
+                        <Label text="Employee Skills" />
                         <Input value="{viewEmployee>/Skill_SkillID}"
                             width="98%"
                             placeholder="" enabled="false"/>
