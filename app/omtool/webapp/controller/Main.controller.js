@@ -1,16 +1,43 @@
 sap.ui.define([
     "./Base.controller",
+    "sap/ui/model/json/JSONModel",
     "sap/ui/core/Fragment",
     "../model/models",
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
     "../model/formatter",
     "sap/m/MessageBox"
-], (BaseController, Fragment, models, Filter, FilterOperator, formatter, MessageBox) => {
+], function (BaseController, JSONModel, Fragment, models, Filter, FilterOperator, formatter, MessageBox) {
     "use strict";
 
-    return BaseController.extend("com.sap.omtool.omtool.controller.EmployeeHeader", {
+    return BaseController.extend("com.sap.omtool.omtool.controller.Main", {
+        
         onInit: function () {
+            // Initialize view model for section visibility
+            var oViewModel = new JSONModel({
+                showEmployeeMaster: true,
+                showReports: false
+            });
+            this.getView().setModel(oViewModel, "viewModel");
+
+            // Initialize report data model with calculated percentages
+            var oReportModel = new JSONModel({
+                totalEmployees: 20,
+                ktStarted: 4,
+                ktNotStarted: 16,
+                ktStartedPercent: 20,
+                ktNotStartedPercent: 80,
+                rolloffStarted: 6,
+                rolloffNotStarted: 14,
+                rolloffStartedPercent: 30,
+                rolloffNotStartedPercent: 70,
+                handoverBegun: 3,
+                handoverNotBegun: 3,
+                handoverBegunPercent: 50,
+                handoverNotBegunPercent: 50
+            });
+            this.getView().setModel(oReportModel, "reportData");
+
             this.initSupportModules();
             // Get the OData model (assuming it's the default model)
             // var oModel = this.getOwnerComponent().getModel();
@@ -23,17 +50,36 @@ sap.ui.define([
 
             // Initialize property to store selected location key
             this._selectedLocationKey = "";
-
-            var oRouter = this.getOwnerComponent().getRouter();
-            oRouter.getRoute("RouteEmployeeHeader").attachPatternMatched(this._onRouteMatched, this);
         },
 
-        _onRouteMatched: function () {
-            // Set the correct button as selected when route is matched
-            var oSegmentedButton = this.byId("navSegmentedButton");
-            if (oSegmentedButton) {
-                oSegmentedButton.setSelectedKey("employeeMaster");
+        onSegmentedButtonChange: function (oEvent) {
+            var sSelectedKey = this.byId("navSegmentedButton").getSelectedKey()
+            var oViewModel = this.getView().getModel("viewModel");
+            
+            // Toggle visibility based on selected button
+            if (sSelectedKey === "employeeMaster") {
+                oViewModel.setProperty("/showEmployeeMaster", true);
+                oViewModel.setProperty("/showReports", false);
+                // Update page title
+                this.byId("mainPage").setTitle("Manager Employee Tracker - Employee Master");
+            } else if (sSelectedKey === "reports") {
+                oViewModel.setProperty("/showEmployeeMaster", false);
+                oViewModel.setProperty("/showReports", true);
+                // Update page title
+                this.byId("mainPage").setTitle("Manager Employee Tracker - Reports");
+                // Load reports data when switching to reports
+                this._loadReportData();
             }
+        },
+
+        onFilterChange: function (oEvent) {
+            // TODO: Implement filter logic
+            // This will handle filter changes and update charts
+        },
+
+        _loadReportData: function () {
+            // TODO: Implement data loading logic
+            // This will be populated with actual OData service calls later
         },
 
         /**
@@ -630,19 +676,6 @@ sap.ui.define([
             } else {
                 this._closeDialog();
             }
-        },
-
-        onNavigateToReports: function () {
-            var oRouter = this.getOwnerComponent().getRouter();
-            oRouter.navTo("Reports");
-        },
-
-        onNavigateToEmployeeMaster: function () {
-            // Already on Employee Master page
-            var oSegmentedButton = this.byId("navSegmentedButton");
-            if (oSegmentedButton) {
-                oSegmentedButton.setSelectedKey("employeeMaster");
-            }
-        },
+        }
     });
 });

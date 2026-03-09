@@ -101,26 +101,15 @@
       },
       "routes": [
         {
-          "name": "RouteEmployeeHeader",
           "pattern": "",
-          "target": [
-            "TargetEmployeeHeader"
-          ]
-        },
-        {
-          "pattern": "reports",
-          "name": "Reports",
-          "target": "TargetReports"
+          "name": "Main",
+          "target": "TargetMain"
         }
       ],
       "targets": {
-        "TargetEmployeeHeader": {
-          "id": "EmployeeHeader",
-          "name": "EmployeeHeader"
-        },
-        "TargetReports": {
-          "id": "Reports",
-          "name": "Reports"
+        "TargetMain": {
+          "id": "Main",
+          "name": "Main"
         }
       }
     },

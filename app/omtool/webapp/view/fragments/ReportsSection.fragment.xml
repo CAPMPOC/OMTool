@@ -1,0 +1,16 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:layout="sap.ui.layout">
+    
+    <VBox id="reportsSection" visible="{viewModel>/showReports}">
+        
+        <!-- Reports Filter Panel -->
+        <core:Fragment fragmentName="com.sap.omtool.omtool.view.fragments.ReportsFilterPanel" type="XML"/>
+        
+        <!-- Charts Section -->
+        <core:Fragment fragmentName="com.sap.omtool.omtool.view.fragments.ReportsCharts" type="XML"/>
+        
+    </VBox>
+    
+</core:FragmentDefinition>

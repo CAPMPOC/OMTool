@@ -1,0 +1,109 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:layout="sap.ui.layout">
+    
+    <ScrollContainer 
+        id="chartsScrollContainer"
+        height="100%" 
+        width="100%" 
+        horizontal="true" 
+        vertical="false"
+        class="sapUiResponsiveMargin">
+        
+        <FlexBox 
+            id="chartsFlexBox"
+            direction="Row" 
+            wrap="NoWrap"
+            justifyContent="Start"
+            alignItems="Start"
+            class="sapUiSmallMargin">
+            
+            <!-- KT Started Distribution Chart -->
+            <Panel 
+                id="ktStartedPanel" 
+                headerText="KT Start..." 
+                width="350px"
+                class="sapUiSmallMarginEnd sapUiSmallMarginBottom">
+                <content>
+                    <VBox 
+                        id="ktChartContainer" 
+                        alignItems="Center" 
+                        justifyContent="Center"
+                        height="300px"
+                        class="sapUiSmallMargin">
+                        <Text text="KT Started: {reportData>/ktStarted} ({reportData>/ktStartedPercent}%)" 
+                            class="sapUiSmallMarginBottom"/>
+                        <Text text="KT Not Started: {reportData>/ktNotStarted} ({reportData>/ktNotStartedPercent}%)" 
+                            class="sapUiTinyMarginBottom"/>
+                        <core:Icon src="sap-icon://pie-chart" size="8rem" color="#0854A0"/>
+                        <HBox class="sapUiTinyMarginTop">
+                            <Button icon="sap-icon://navigation-left-arrow" type="Transparent"/>
+                            <core:Icon src="sap-icon://circle-task" size="1rem" color="#0854A0" 
+                                class="sapUiTinyMarginBegin sapUiTinyMarginEnd"/>
+                            <Button icon="sap-icon://navigation-right-arrow" type="Transparent"/>
+                        </HBox>
+                    </VBox>
+                </content>
+            </Panel>
+
+            <!-- Roll-off Started Distribution Chart -->
+            <Panel 
+                id="rolloffStartedPanel" 
+                headerText="Roll-off ..." 
+                width="350px"
+                class="sapUiSmallMarginEnd sapUiSmallMarginBottom">
+                <content>
+                    <VBox 
+                        id="rolloffChartContainer" 
+                        alignItems="Center" 
+                        justifyContent="Center"
+                        height="300px"
+                        class="sapUiSmallMargin">
+                        <Text text="Roll-off Started: {reportData>/rolloffStarted} ({reportData>/rolloffStartedPercent}%)" 
+                            class="sapUiSmallMarginBottom"/>
+                        <Text text="Roll-off Not Started: {reportData>/rolloffNotStarted} ({reportData>/rolloffNotStartedPercent}%)" 
+                            class="sapUiTinyMarginBottom"/>
+                        <core:Icon src="sap-icon://pie-chart" size="8rem" color="#0854A0"/>
+                        <HBox class="sapUiTinyMarginTop">
+                            <Button icon="sap-icon://navigation-left-arrow" type="Transparent"/>
+                            <core:Icon src="sap-icon://circle-task" size="1rem" color="#0854A0" 
+                                class="sapUiTinyMarginBegin sapUiTinyMarginEnd"/>
+                            <Button icon="sap-icon://navigation-right-arrow" type="Transparent"/>
+                        </HBox>
+                    </VBox>
+                </content>
+            </Panel>
+
+            <!-- Handover/KT Begun Chart -->
+            <Panel 
+                id="handoverKTPanel" 
+                headerText="Handover/KT Begun (among Roll-offs)" 
+                width="350px"
+                class="sapUiSmallMarginBottom">
+                <content>
+                    <VBox 
+                        id="handoverChartContainer" 
+                        alignItems="Center" 
+                        justifyContent="Center"
+                        height="300px"
+                        class="sapUiSmallMargin">
+                        <Text text="Handover Begun: {reportData>/handoverBegun} ({reportData>/handoverBegunPercent}%)" 
+                            class="sapUiSmallMarginBottom"/>
+                        <Text text="Handover Not Begun: {reportData>/handoverNotBegun} ({reportData>/handoverNotBegunPercent}%)" 
+                            class="sapUiTinyMarginBottom"/>
+                        <core:Icon src="sap-icon://pie-chart" size="8rem" color="#0854A0"/>
+                        <HBox class="sapUiTinyMarginTop">
+                            <Button icon="sap-icon://navigation-left-arrow" type="Transparent"/>
+                            <core:Icon src="sap-icon://circle-task" size="1rem" color="#0854A0" 
+                                class="sapUiTinyMarginBegin sapUiTinyMarginEnd"/>
+                            <Button icon="sap-icon://navigation-right-arrow" type="Transparent"/>
+                        </HBox>
+                    </VBox>
+                </content>
+            </Panel>
+            
+        </FlexBox>
+    </ScrollContainer>
+    
+</core:FragmentDefinition>
