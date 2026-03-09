@@ -16,8 +16,8 @@ entity EmployeeHeader : cuid {
             Staff_RollOffStatus  : Boolean default false;
             RollOffDate          : Date;
             Accessibility        : Association to AccessibilityVH;
-            NonSAP               : Integer default 0;
-            SAP                  : Integer default 0;
+            NonSAP               : Integer;
+            SAP                  : Integer;
     virtual SAPToday             : Integer;
             RollOffImpact        : Association to RollofImpactVH;
             Skill                : Association to SkillVH;

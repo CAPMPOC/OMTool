@@ -36,7 +36,64 @@
                         press="onAddEmployee"/>
                 </OverflowToolbar>
             </smartTable:customToolbar>
-            
+            <Table id="innerTable" mode="None">
+        <columns>
+            <!-- Actions Column -->
+            <Column 
+                width="8em" 
+                hAlign="Center"
+                demandPopin="false">
+                <customData>
+                    <core:CustomData 
+                        key="p13nData" 
+                        value='\{"columnKey":"Actions", "columnIndex":"999"}' />
+                </customData>
+                <Text text="Actions"/>
+            </Column>
+        </columns>
+
+        <items>
+            <ColumnListItem>
+                <cells>
+                    <!-- Actions Cell -->
+                    <HBox 
+    justifyContent="Center" 
+    class="sapUiTinyMarginBeginEnd">
+    <core:Icon
+        src="sap-icon://show"
+        color="#0a6ed1"
+        press="onViewEmployee"
+        class="sapUiSmallMarginEnd sapUiTinyMarginTop"
+        tooltip="View">
+        <core:layoutData>
+            <FlexItemData growFactor="0"/>
+        </core:layoutData>
+    </core:Icon>
+    <core:Icon
+        src="sap-icon://edit"
+        color="#0854a0"
+        press="onEdit"
+        class="sapUiSmallMarginEnd sapUiTinyMarginTop"
+        tooltip="Edit">
+        <core:layoutData>
+            <FlexItemData growFactor="0"/>
+        </core:layoutData>
+    </core:Icon>
+    <!-- <core:Icon
+        src="sap-icon://delete"
+        color="#bb0000"
+        press="onDelete"
+        class="sapUiTinyMarginTop"
+        tooltip="Delete">
+        <core:layoutData>
+            <FlexItemData growFactor="0"/>
+        </core:layoutData>
+    </core:Icon> -->
+</HBox>
+                </cells>
+            </ColumnListItem>
+        </items>
+    </Table>
         </smartTable:SmartTable>
         
     </VBox>

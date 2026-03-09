@@ -11,7 +11,7 @@ sap.ui.define([
     "use strict";
 
     return BaseController.extend("com.sap.omtool.omtool.controller.Main", {
-        
+
         onInit: function () {
             // Initialize view model for section visibility
             var oViewModel = new JSONModel({
@@ -55,7 +55,7 @@ sap.ui.define([
         onSegmentedButtonChange: function (oEvent) {
             var sSelectedKey = this.byId("navSegmentedButton").getSelectedKey()
             var oViewModel = this.getView().getModel("viewModel");
-            
+
             // Toggle visibility based on selected button
             if (sSelectedKey === "employeeMaster") {
                 oViewModel.setProperty("/showEmployeeMaster", true);
@@ -415,14 +415,14 @@ sap.ui.define([
                     SAP: 0,
                     NonSAP: 0,
                     SAPToday: '',
-                    Skill_SkillID:"",
+                    Skill_SkillID: "",
                     statusRollOffStarted: false,
                     statusHandoverKTBegun: false
                 };
-                
+
                 const oEmployeeModel = new sap.ui.model.json.JSONModel(oEmptyEmployee);
                 this.getView().setModel(oEmployeeModel, "employee");
-                
+
                 oDialog.open();
             }.bind(this));
         },
@@ -432,36 +432,36 @@ sap.ui.define([
                 const oView = this.getView();
                 const oEmployeeModel = oView.getModel("employee");
                 const oEmployeeData = oEmployeeModel.getData();
-                
+
                 // Validate required fields
                 if (!this._validateEmployeeData(oEmployeeData)) {
                     MessageBox.error("Please fill all required fields:\n- Employee ID\n- First Name\n- Last Name\n- Kick-off Date\n- SAP Experience");
                     return;
                 }
-                
+
                 // Show busy indicator
                 const oDialog = this.byId("employeeDialog");
                 oDialog.setBusy(true);
-                
+
                 const oModel = this.getView().getModel(); // Your OData V2 model
-                
+
                 // Execute batch operation
                 await this._createAndSaveEmployee(oModel, oEmployeeData);
-                
+
                 // Success - close dialog and refresh
                 oDialog.setBusy(false);
-                
+
                 MessageBox.success("Employee saved successfully", {
-                    onClose: function() {
+                    onClose: function () {
                         this._closeDialog();
                         this._refreshMainView();
                     }.bind(this)
                 });
-                
+
             } catch (error) {
                 MessageBox.error("Error saving employee: " + (error.message || "Unknown error"));
                 console.error("Save employee error:", error);
-                
+
                 const oDialog = this.byId("employeeDialog");
                 if (oDialog) {
                     oDialog.setBusy(false);
@@ -469,18 +469,18 @@ sap.ui.define([
             }
         },
 
-        _validateEmployeeData: function(oData) {
+        _validateEmployeeData: function (oData) {
             // Validate required fields
             return !!(
-                oData.Empid && 
-                oData.firstName && 
-                oData.lastName && 
+                oData.Empid &&
+                oData.firstName &&
+                oData.lastName &&
                 oData.rollOnDate &&
                 oData.SAP
             );
         },
 
-        _prepareEmployeePayload: function(oEmployeeData) {
+        _prepareEmployeePayload: function (oEmployeeData) {
             // Map frontend model to backend entity structure
             return {
                 Empid: oEmployeeData.Empid.trim(),
@@ -505,49 +505,49 @@ sap.ui.define([
             };
         },
 
-        _formatDate: function(sDate) {
+        _formatDate: function (sDate) {
             // Ensure date is in correct format for backend
             if (!sDate) return null;
-            
+
             // If it's already a Date object
             if (sDate instanceof Date) {
                 return sDate.toISOString().split('T')[0];
             }
-            
+
             // If it's a string in yyyy-MM-dd format, return as is
             if (typeof sDate === 'string' && sDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
                 return sDate;
             }
-            
+
             // Try to parse and format
             const oDate = new Date(sDate);
             if (!isNaN(oDate.getTime())) {
                 return oDate.toISOString().split('T')[0];
             }
-            
+
             return null;
         },
 
-        _createAndSaveEmployee: function(oModel, oEmployeeData) {
+        _createAndSaveEmployee: function (oModel, oEmployeeData) {
             return new Promise((resolve, reject) => {
                 const oPayload = this._prepareEmployeePayload(oEmployeeData);
-                
+
                 console.log("Creating employee with payload:", oPayload);
-                
+
                 // Store the employee ID for later use
                 let sCreatedEmployeeId = null;
-                
+
                 // Create the draft entry
                 oModel.create("/EmployeeHeader", oPayload, {
-                    success: function(oCreatedData) {
+                    success: function (oCreatedData) {
                         console.log("Draft created successfully:", oCreatedData);
                         sCreatedEmployeeId = oCreatedData.ID;
-                        
+
                         if (!sCreatedEmployeeId) {
                             reject(new Error("No ID returned from create operation"));
                             return;
                         }
-                        
+
                         // Now prepare and activate the draft using POST
                         this._prepareDraftPost(oModel, sCreatedEmployeeId)
                             .then(() => {
@@ -561,12 +561,12 @@ sap.ui.define([
                                 console.error("Error in draft prepare/activate:", error);
                                 reject(error);
                             });
-                            
+
                     }.bind(this),
-                    error: function(oError) {
+                    error: function (oError) {
                         console.error("Create draft error:", oError);
                         let sErrorMsg = "Failed to create employee entry";
-                        
+
                         try {
                             if (oError.responseText) {
                                 const oErrorResponse = JSON.parse(oError.responseText);
@@ -575,21 +575,21 @@ sap.ui.define([
                         } catch (e) {
                             console.error("Error parsing error response:", e);
                         }
-                        
+
                         reject(new Error(sErrorMsg));
                     }
                 });
             });
         },
 
-        _prepareDraftPost: function(oModel, sEmployeeId) {
+        _prepareDraftPost: function (oModel, sEmployeeId) {
             return new Promise((resolve, reject) => {
                 // Use POST to call the bound action
                 const sPath = `/EmployeeHeader(ID=${sEmployeeId},IsActiveEntity=false)/OMTSrv.draftPrepare`;
                 const oPayload = {
                     SideEffectsQualifier: ""
                 };
-                
+
                 console.log("Preparing draft for:", sEmployeeId);
                 console.log("POST path:", sPath);
 
@@ -603,7 +603,7 @@ sap.ui.define([
             });
         },
 
-        _activateDraftPost: function(oModel, sEmployeeId) {
+        _activateDraftPost: function (oModel, sEmployeeId) {
             return new Promise((resolve, reject) => {
                 // Use POST to call the bound action
                 const aSelects = [
@@ -615,17 +615,17 @@ sap.ui.define([
                     "Staff_RollOffReasons", "Staff_RollOffStatus", "handoverKtBegun",
                     "isNewRecord", "ktStarted"
                 ];
-                
+
                 const sExpand = "Accessibility($select=AccessID,Description)," +
-                               "DraftAdministrativeData($select=DraftIsCreatedByMe,DraftUUID,InProcessByUser)," +
-                               "Location($select=LocDesc,LocID)";
-                
+                    "DraftAdministrativeData($select=DraftIsCreatedByMe,DraftUUID,InProcessByUser)," +
+                    "Location($select=LocID,LocDesc)";
+
                 const sPath = `/EmployeeHeader(ID=${sEmployeeId},IsActiveEntity=false)/OMTSrv.draftActivate` +
-                             `?$select=${aSelects.join(",")}&$expand=${sExpand}`;
-                
+                    `?$select=${aSelects.join(",")}&$expand=${sExpand}`;
+
                 console.log("Activating draft for:", sEmployeeId);
                 console.log("POST path:", sPath);
-                
+
                 this.oODataService.createEntity(sPath)
                     .then((oData) => {
                         resolve(oData)
@@ -636,20 +636,20 @@ sap.ui.define([
             });
         },
 
-        _closeDialog: function() {
+        _closeDialog: function () {
             const oDialog = this.byId("employeeDialog");
             if (oDialog) {
                 oDialog.close();
             }
         },
 
-        _refreshMainView: function() {
+        _refreshMainView: function () {
             // Refresh your SmartTable
             const oSmartTable = this.byId("smartTable"); // Replace with your actual SmartTable ID
             if (oSmartTable) {
                 oSmartTable.rebindTable();
             }
-            
+
             // Also refresh the model to ensure data is up-to-date
             const oModel = this.getView().getModel();
             if (oModel) {
@@ -657,17 +657,17 @@ sap.ui.define([
             }
         },
 
-        onCancelEmployee: function() {
+        onCancelEmployee: function () {
             // Optional: Show confirmation dialog if data was entered
             const oEmployeeModel = this.getView().getModel("employee");
             const oData = oEmployeeModel.getData();
-            
+
             const bHasData = !!(oData.Empid || oData.firstName || oData.lastName);
-            
+
             if (bHasData) {
                 MessageBox.confirm("Are you sure you want to cancel? All entered data will be lost.", {
                     title: "Confirm Cancel",
-                    onClose: function(sAction) {
+                    onClose: function (sAction) {
                         if (sAction === MessageBox.Action.OK) {
                             this._closeDialog();
                         }
@@ -675,6 +675,58 @@ sap.ui.define([
                 });
             } else {
                 this._closeDialog();
+            }
+        },
+        onViewEmployee: function (oEvent) {
+            var oButton = oEvent.getSource();
+            var oContext = oButton.getBindingContext();
+
+            if (!oContext) {
+                MessageToast.show("No employee data available");
+                return;
+            }
+
+            // Get the employee data from the context
+            var oEmployeeData = oContext.getObject();
+
+            console.log("Employee Data:", oEmployeeData); // Debug log
+
+            // Create a JSON model with the employee data
+            var oViewModel = new sap.ui.model.json.JSONModel(oEmployeeData);
+
+            var oView = this.getView();
+
+            if (!this._oEmployeeDetailDialog) {
+                Fragment.load({
+                    id: oView.getId(),
+                    name: "com.sap.omtool.omtool.view.fragments.ViewEmployee",
+                    controller: this
+                }).then(function (oDialog) {
+                    this._oEmployeeDetailDialog = oDialog;
+                    oView.addDependent(this._oEmployeeDetailDialog);
+
+                    // Set the viewEmployee model to the dialog
+                    this._oEmployeeDetailDialog.setModel(oViewModel, "viewEmployee");
+
+                    this._oEmployeeDetailDialog.open();
+                }.bind(this));
+            } else {
+                // Update the viewEmployee model with new data
+                this._oEmployeeDetailDialog.setModel(oViewModel, "viewEmployee");
+                this._oEmployeeDetailDialog.open();
+            }
+        },
+
+        onCloseEmployeeDetail: function () {
+            if (this._oEmployeeDetailDialog) {
+                this._oEmployeeDetailDialog.close();
+            }
+        },
+
+        // Cleanup when view is destroyed
+        onExit: function () {
+            if (this._oEmployeeDetailDialog) {
+                this._oEmployeeDetailDialog.destroy();
             }
         }
     });

@@ -183,10 +183,8 @@
                         width="30%"
                         class="sapUiSmallMarginEnd">
                         <Label
-                            id="lblNonSAPExp"
                             text="Non-SAP Experience" />
                         <Input
-                            id="inputNonSAPExp"
                             value="{employee>/NonSAP}"
                             width="100%"  />
                     </VBox>

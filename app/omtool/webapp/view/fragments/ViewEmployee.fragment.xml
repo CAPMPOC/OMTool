@@ -1,0 +1,219 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:l="sap.ui.layout">
+
+    <Dialog
+        id="viewEmployeeView"
+        title="View viewEmployee"
+        contentWidth="500px"
+        contentHeight="auto"
+        resizable="false"
+        draggable="true">
+
+        <content>
+            <VBox class="sapUiSmallMarginBegin sapUiSmallMarginTop">
+                <Title  
+                        text="Basic Information" 
+                        level="H4"
+                        class="sapUiSmallMarginBottom"/>
+                <!-- viewEmployee ID -->
+                <VBox class="sapUiSmallMarginBottom">
+                    <Label text="viewEmployee ID" required="true"/>
+                    <Input value="{viewEmployee>/Empid}"
+                        width="98%"
+                        placeholder=""/>
+                </VBox>
+                
+                <HBox >
+                <VBox class="sapUiSmallMarginEnd" width="48%">
+                    <Label text="First Name" required="true"/>
+                    <Input value="{viewEmployee>/firstName}"
+                        width="100%"
+                        placeholder=""/>
+                </VBox>
+                <VBox class="sapUiSmallMarginEnd" width="48%">
+                    <Label text="Last Name" required="true"/>
+                    <Input
+                        value="{viewEmployee>/lastName}"
+                        width="100%"
+                        placeholder=""/>
+                </VBox>
+                </HBox>
+                
+                <!-- Address -->
+                <HBox >
+                <VBox width="48%" class="sapUiSmallMarginEnd">
+                    <Label text="viewEmployee Location"/>
+                    <Input
+                        value="{viewEmployee>/location}"
+                        width="100%"
+                        placeholder=""/>
+                </VBox>
+
+                <VBox width="48%" class="sapUiSmallMarginEnd">
+                    <Label text="C-User ID"/>
+                    <Input
+                        value="{viewEmployee>/CID}"
+                        width="100%"
+                        placeholder=""/>
+                </VBox>
+                </HBox>
+                
+                <!-- Date Fields Row -->
+                <Title
+                        text="Assignment" 
+                        level="H4"
+                        class="sapUiSmallMarginBottom sapUiSmallMarginTop"/>
+
+                         <!-- Employer Name -->
+                <VBox>
+                    <Label
+                        text="Employer Name" />
+                    <Input
+                        value="{viewEmployee>/Employer}"
+                        width="98%"
+                        placeholder="" />
+                </VBox>
+                    <HBox>
+                  <VBox width="48%" class="sapUiSmallMarginEnd">
+                    <Label text="ProductGroup"/>
+                    <Input 
+                        value="{viewEmployee>/ProductGroup}"
+                        width="100%"
+                        placeholder=""/>
+                </VBox>
+
+                <VBox width="48%" class="sapUiSmallMarginEnd">
+                    <Label text="Service Group"/>
+                    <Input value="{viewEmployee>/ServiceGroup}"
+                        width="100%"
+                        placeholder=""/>
+                </VBox>
+                </HBox>
+
+                <HBox>
+                <VBox  width="48%" class="sapUiSmallMarginEnd">
+                    <Label text="Product"/>
+                    <Input 
+                        value="{viewEmployee>/Product}"
+                        width="100%"
+                        placeholder=""/>
+                </VBox>   
+
+                <VBox  width="48%" class="sapUiSmallMarginEnd">
+                    <Label text="Accessibility"/>
+                    <Input value="{viewEmployee>/Accessibility}"
+                        width="100%"
+                        placeholder=""/>
+                </VBox>      
+                </HBox>
+                <HBox class="sapUiSmallMarginTop">
+                    
+                    <!-- Kick-off Date -->
+                    <VBox width="48%" class="sapUiSmallMarginEnd">
+                    
+                        <Label text="Roll-On Date" required="true"/>
+                        <DatePicker value="{viewEmployee>/rollOnDate}"
+                            valueFormat="yyyy-MM-dd"
+                            displayFormat="MM/dd/yyyy"
+                            width="100%"
+                            placeholder="mm/dd/yyyy"
+                            />
+                    </VBox>
+                    
+                    <!-- Roll-off Date -->
+                    <VBox width="48%" class="sapUiSmallMarginEnd">
+                        <Label text="Roll-off Date"/>
+                        <DatePicker value="{viewEmployee>/rollOffDate}"
+                            valueFormat="yyyy-MM-dd"
+                            displayFormat="MM/dd/yyyy"
+                            width="100%"
+                            placeholder="mm/dd/yyyy"/>
+                    </VBox>
+                </HBox>
+                
+                <!-- EXPERIENCE SECTION -->
+                <Title text="Experience"
+                    level="H4"
+                    class="sapUiSmallMarginBottom sapUiSmallMarginTop" />
+                
+                <!-- SAP and Non-SAP Experience -->
+                <HBox>
+                    <VBox width="30%"
+                        class="sapUiSmallMarginEnd">
+                        <Label text="SAP Experience"
+                            required="true" />
+                        <Input value="{viewEmployee>/SAP}"
+                            width="100%" />
+                    </VBox>
+                    
+                    <VBox width="30%"
+                        class="sapUiSmallMarginEnd">
+                        <Label id="lblNonSAPExp"
+                            text="Non-SAP Experience" />
+                        <Input id="inputNonSAPExp"
+                            value="{viewEmployee>/NonSAP}"
+                            width="100%"  />
+                    </VBox>
+
+                    <VBox width="30%"
+                        class="sapUiSmallMarginEnd">
+                        <Label text="Total Experience" />
+                        <Input value="{viewEmployee>/SAPToday}"
+                            width="100%"
+                            placeholder=""  enabled="false"/>
+                    </VBox>
+                </HBox>
+                
+                <!-- Total Experience and Skills -->
+                <!-- <HBox id="hboxTotalExpSkills"> -->
+                    
+                    
+                    <VBox>
+                        <Label text="viewEmployee Skills" />
+                        <Input value="{viewEmployee>/Skill_SkillID}"
+                            width="98%"
+                            placeholder="" />
+                    </VBox>
+                <!-- </HBox> -->
+                
+                
+                <!-- Status Tracking Section -->
+                <VBox class="sapUiMediumMarginTop">
+                    
+                    <!-- Status Tracking Title -->
+                    <Title text="Status Tracking" 
+                        level="H4"/>
+                    <HBox>
+                    <HBox justifyContent="Start"
+                        alignItems="Center"
+                        width="50%"
+                        class="sapUiSmallMarginTop">
+                        <Text text="Roll-off Started" />
+                        <Switch
+                            state="true"  customTextOn="Yes" customTextOff="No" />
+                    </HBox>
+                    
+                    <HBox justifyContent="Start"
+                        alignItems="Center"
+                        width="50%"
+                        class="sapUiSmallMarginTop">
+                        <Text text="Handover/KT Begun" />
+                        <Switch state="true"  customTextOn="Yes" customTextOff="No" />
+                    </HBox>
+                </HBox>
+                    
+                </VBox>
+                
+            </VBox>
+        </content>
+        <endButton>
+            <Button
+                text="Close"
+                press="onCloseviewEmployeeDetail"
+                icon="sap-icon://decline"/>
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>
