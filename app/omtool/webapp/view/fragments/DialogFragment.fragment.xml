@@ -50,7 +50,7 @@
                 <!-- Address -->
                 <HBox >
                 <VBox id="vboxLocation" width="48%" class="sapUiSmallMarginEnd">
-                    <Label id="lblLocation" text="Employee Location"/>
+                    <Label id="lblLocation" text="Employee Location" required="true"/>
                     <Input 
                         id="inputLocation" 
                         value="{employee>/location}"
@@ -59,7 +59,7 @@
                 </VBox>
 
                 <VBox id="vboxCuserId" width="48%" class="sapUiSmallMarginEnd">
-                    <Label id="lblCuserId" text="C-User ID"/>
+                    <Label id="lblCuserId" text="C-User ID" required="true"/>
                     <Input 
                         id="inputCuserId" 
                         value="{employee>/CID}"
