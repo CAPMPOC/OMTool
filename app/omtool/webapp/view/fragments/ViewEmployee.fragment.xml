@@ -78,16 +78,16 @@
                 </VBox>
                     <HBox class="sapUiSmallMarginBottom">
                   <VBox width="48%" class="sapUiSmallMarginEnd">
-                    <Label text="ProductGroup"/>
+                    <Label text="Product Group"/>
                     <Input 
-                        value="{viewEmployee>/Product Group}"
+                        value="{viewEmployee>/ProductGroup}"
                         width="100%"
                         placeholder="" enabled="false"/>
                 </VBox>
 
                 <VBox width="48%" class="sapUiSmallMarginEnd">
                     <Label text="Service Group"/>
-                    <Input value="{viewEmployee>/Service Group}"
+                    <Input value="{viewEmployee>/ServiceGroup}"
                         width="100%"
                         placeholder="" enabled="false"/>
                 </VBox>

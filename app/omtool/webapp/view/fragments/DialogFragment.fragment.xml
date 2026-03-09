@@ -94,7 +94,7 @@
                     <Input 
                         id="inputProductGroup" 
                         class="sapUiSmallMarginBottom"
-                        value="{employee>/Product Group}"
+                        value="{employee>/ProductGroup}"
                         width="100%"
                         placeholder=""/>
                 </VBox>
