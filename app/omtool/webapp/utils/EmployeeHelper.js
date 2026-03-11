@@ -23,14 +23,38 @@ sap.ui.define([
                 Employer: this._trimString(oEmployeeData.Employer) || "",
                 RollOnDate: this.formatDate(oEmployeeData.rollOnDate),
                 RollOffDate: this.formatDate(oEmployeeData.rollOffDate),
-                SAP: parseInt(oEmployeeData.SAP) || 0,
-                NonSAP: parseInt(oEmployeeData.NonSAP) || 0,
-                SAPToday: parseInt(oEmployeeData.SAPToday) || 0,
+                SAP: this._parseInteger(oEmployeeData.SAP),           // ✅ Changed
+                NonSAP: this._parseInteger(oEmployeeData.NonSAP),     // ✅ Changed
+                SAPToday: this._parseInteger(oEmployeeData.SAPToday), // ✅ Changed
                 Skill_SkillID: this._trimString(oEmployeeData.Skill) || "",
                 Staff_RollOffStatus: oEmployeeData.statusRollOffStarted || false,
                 handoverKtBegun: oEmployeeData.statusHandoverKTBegun || false,
                 IsActiveEntity: false
             };
+        },
+
+        /**
+         * Safely parse integer with validation
+         * @private
+         * @param {any} vValue - Value to parse
+         * @returns {number|null} - Parsed integer or null if invalid
+         */
+        _parseInteger: function (vValue) {
+            // Handle null/undefined
+            if (vValue === null || vValue === undefined || vValue === "") {
+                return null; // ✅ Return null instead of 0 for empty values
+            }
+
+            // Parse the value
+            var iParsed = parseInt(vValue, 10);
+
+            // Check if parsing was successful
+            if (isNaN(iParsed)) {
+                console.warn("Invalid integer value:", vValue);
+                return null; // ✅ Return null for invalid values
+            }
+
+            return iParsed;
         },
 
         /**
