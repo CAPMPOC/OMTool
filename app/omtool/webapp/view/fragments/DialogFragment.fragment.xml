@@ -199,7 +199,10 @@
                             id="sapExperience"
                             value="{
                                 path: 'employee>/SAP',
-                                type: 'sap.ui.model.type.Integer'
+                                type: 'sap.ui.model.type.Integer',
+                                constraints: {
+                                    minimum: 0
+                                }
                             }"
                             type="Number"
                             width="100%" />
@@ -212,9 +215,13 @@
                         <Label
                             text="Non-SAP Experience" />
                         <Input
+                            id="nonSapExperience"
                             value="{
                                 path: 'employee>/NonSAP',
-                                type: 'sap.ui.model.type.Integer'
+                                type: 'sap.ui.model.type.Integer',
+                                constraints: {
+                                    minimum: 0
+                                }
                             }"
                             type="Number"
                             width="100%" />
