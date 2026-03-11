@@ -1,0 +1,23 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+    
+    <SelectDialog
+        id="employeeLocationSelectDialog"
+        title="Select Employee Location"
+        noDataText="No locations found"
+        search=".onEmployeeLocationSearch"
+        confirm=".onEmployeeLocationDialogConfirm"
+        cancel=".onEmployeeLocationDialogCancel"
+        items="{path: '/LocationVH'}"
+        growing="true"
+        growingThreshold="20">
+        
+        <StandardListItem
+            title="{LocDesc}"
+            description="{LocID}"
+            type="Active"/>
+            
+    </SelectDialog>
+    
+</core:FragmentDefinition>

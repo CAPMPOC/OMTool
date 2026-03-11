@@ -229,6 +229,156 @@ sap.ui.define([
             }
         },
 
+        // ==========================================
+        // EMPLOYEE LOCATION VALUE HELP METHODS
+        // (For Add Employee Dialog - No Filtering)
+        // ==========================================
+
+        /**
+         * Handle suggestion event for Employee Location input
+         * @param {sap.ui.base.Event} oEvent - Suggest event
+         */
+        onEmployeeLocationSuggest: function (oEvent) {
+            var sValue = oEvent.getParameter("suggestValue");
+            var aFilters = [];
+
+            if (sValue) {
+                // Filter suggestions based on user input
+                aFilters = [
+                    new Filter({
+                        filters: [
+                            new Filter("LocDesc", FilterOperator.Contains, sValue),
+                            new Filter("LocID", FilterOperator.Contains, sValue)
+                        ],
+                        and: false
+                    })
+                ];
+            }
+
+            // Apply filters to suggestion items
+            var oInput = oEvent.getSource();
+            var oBinding = oInput.getBinding("suggestionItems");
+
+            if (oBinding) {
+                oBinding.filter(aFilters);
+            }
+        },
+
+        /**
+         * Handle suggestion item selected for Employee Location
+         * @param {sap.ui.base.Event} oEvent - Selection event
+         */
+        onEmployeeLocationSuggestionSelected: function (oEvent) {
+            var oSelectedItem = oEvent.getParameter("selectedItem");
+
+            if (oSelectedItem) {
+                var sLocationID = oSelectedItem.getKey();
+                var sLocationText = oSelectedItem.getText();
+
+                // Update the employee model with both ID and description
+                var oEmployeeModel = this.getView().getModel("employee");
+                oEmployeeModel.setProperty("/location", sLocationID);
+                oEmployeeModel.setProperty("/locationDesc", sLocationText);
+
+                console.log("Employee Location selected from suggestion - ID:", sLocationID, "Text:", sLocationText);
+            }
+        },
+
+        /**
+         * Handle Value Help Request for Employee Location
+         * @param {sap.ui.base.Event} oEvent - Value help request event
+         */
+        onEmployeeLocationValueHelp: function (oEvent) {
+            var oView = this.getView();
+
+            // Create dialog lazily
+            if (!this._employeeLocationDialog) {
+                Fragment.load({
+                    id: oView.getId(),
+                    name: "com.sap.omtool.omtool.view.fragments.EmployeeLocationValueHelp",
+                    controller: this
+                }).then(function (oDialog) {
+                    this._employeeLocationDialog = oDialog;
+                    oView.addDependent(this._employeeLocationDialog);
+                    this._employeeLocationDialog.open();
+                }.bind(this));
+            } else {
+                this._employeeLocationDialog.open();
+            }
+        },
+
+        /**
+         * Handle search in Employee Location Value Help dialog
+         * @param {sap.ui.base.Event} oEvent - Search event
+         */
+        onEmployeeLocationSearch: function (oEvent) {
+            var sValue = oEvent.getParameter("value");
+            var oFilter = new Filter({
+                filters: [
+                    new Filter("LocDesc", FilterOperator.Contains, sValue),
+                    new Filter("LocID", FilterOperator.Contains, sValue)
+                ],
+                and: false
+            });
+
+            var oBinding = oEvent.getSource().getBinding("items");
+            oBinding.filter([oFilter]);
+        },
+
+        /**
+         * Handle confirm in Employee Location Value Help dialog
+         * @param {sap.ui.base.Event} oEvent - Confirm event
+         */
+        onEmployeeLocationDialogConfirm: function (oEvent) {
+            var oSelectedItem = oEvent.getParameter("selectedItem");
+
+            if (oSelectedItem) {
+                var sLocationText = oSelectedItem.getTitle();
+                var sLocationID = oSelectedItem.getDescription();
+
+                // Update the employee model with both ID and description
+                var oEmployeeModel = this.getView().getModel("employee");
+                oEmployeeModel.setProperty("/location", sLocationID);
+                oEmployeeModel.setProperty("/locationDesc", sLocationText);
+
+                // Also update the input field directly
+                var oLocationInput = this.byId("inputEmployeeLocation");
+                if (oLocationInput) {
+                    oLocationInput.setValue(sLocationText);
+                }
+
+                console.log("Employee Location selected from dialog - ID:", sLocationID, "Text:", sLocationText);
+            }
+
+            // Clear the search filter
+            oEvent.getSource().getBinding("items").filter([]);
+        },
+
+        /**
+         * Handle cancel in Employee Location Value Help dialog
+         * @param {sap.ui.base.Event} oEvent - Cancel event
+         */
+        onEmployeeLocationDialogCancel: function (oEvent) {
+            // Clear the search filter
+            oEvent.getSource().getBinding("items").filter([]);
+        },
+
+        /**
+         * Handle change in Employee Location input (for manual entry or clearing)
+         * @param {sap.ui.base.Event} oEvent - Change event
+         */
+        onEmployeeLocationChange: function (oEvent) {
+            var sValue = oEvent.getParameter("value");
+            var oEmployeeModel = this.getView().getModel("employee");
+
+            // If input is cleared, reset the stored values
+            if (!sValue || sValue.trim() === "") {
+                oEmployeeModel.setProperty("/location", "");
+                oEmployeeModel.setProperty("/locationDesc", "");
+                console.log("Employee Location cleared");
+            }
+        },
+
         /**
          * Placeholder for search functionality
          * @param {sap.ui.base.Event} oEvent - Search event
@@ -403,7 +553,8 @@ sap.ui.define([
                     Empid: "",
                     firstName: "",
                     lastName: "",
-                    location: "",
+                    location: "",       // This stores the LocID for backend
+                    locationDesc: "",      // This stores the LocDesc for display
                     CID: "",
                     ProductGroup: "",
                     ServiceGroup: "",
@@ -423,8 +574,25 @@ sap.ui.define([
                 const oEmployeeModel = new sap.ui.model.json.JSONModel(oEmptyEmployee);
                 this.getView().setModel(oEmployeeModel, "employee");
 
+                // Reset dialog fields
+                this._resetDialogFields();
+
                 oDialog.open();
             }.bind(this));
+        },
+
+        /**
+        * Reset all input fields in the Add Employee dialog
+        * @private
+        */
+        _resetDialogFields: function () {
+            // Clear location input
+            var oLocationInput = this.byId("inputEmployeeLocation");
+            if (oLocationInput) {
+                oLocationInput.setValue("");
+            }
+
+            // Add other fields here if needed
         },
 
         onAddEmployeePress: async function () {
@@ -618,7 +786,7 @@ sap.ui.define([
 
                 const sExpand = "Accessibility($select=AccessID,Description)," +
                     "DraftAdministrativeData($select=DraftIsCreatedByMe,DraftUUID,InProcessByUser)," +
-                    "Location($select=LocID,LocDesc)";
+                    "Location($select=LocDesc,LocID)";
 
                 const sPath = `/EmployeeHeader(ID=${sEmployeeId},IsActiveEntity=false)/OMTSrv.draftActivate` +
                     `?$select=${aSelects.join(",")}&$expand=${sExpand}`;

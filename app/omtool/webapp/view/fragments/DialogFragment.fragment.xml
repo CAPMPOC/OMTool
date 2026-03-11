@@ -52,10 +52,24 @@
                 <VBox id="vboxLocation" width="48%" class="sapUiSmallMarginEnd">
                     <Label id="lblLocation" text="Employee Location" required="true"/>
                     <Input 
-                        id="inputLocation" 
-                        value="{employee>/location}"
+                        id="inputEmployeeLocation" 
+                        value="{employee>/locationDesc}"
                         width="100%"
-                        placeholder=""/>
+                        placeholder="Select Location"
+                        showClearIcon="true"
+                        showValueHelp="true"
+                        valueHelpRequest=".onEmployeeLocationValueHelp"
+                        showSuggestion="true"
+                        suggestionItems="{path: '/LocationVH'}"
+                        suggest=".onEmployeeLocationSuggest"
+                        suggestionItemSelected=".onEmployeeLocationSuggestionSelected"
+                        change=".onEmployeeLocationChange">
+                        <suggestionItems>
+                            <core:Item 
+                                key="{LocID}" 
+                                text="{LocDesc}"/>
+                    </suggestionItems>
+                </Input>
                 </VBox>
 
                 <VBox id="vboxCuserId" width="48%" class="sapUiSmallMarginEnd">
@@ -120,12 +134,19 @@
                 </VBox>   
 
                 <VBox id="vboxAccessibility"  width="48%" class="sapUiSmallMarginEnd">
-                    <Label id="lblAccessibility" text="Accessibility"/>
-                    <Input 
-                        id="inputAccessibility" 
-                        value="{employee>/Accessibility}"
-                        width="100%"
-                        placeholder=""/>
+                    <Label id="lblAccessibility" text="Position"/>
+                    <ComboBox
+                        id="PositionAddEmployee"
+                        placeholder="Position"
+                        width="240px"
+                        class="sapUiTinyMarginEnd"
+                        showClearIcon="true"
+                        selectedKey="{employee>/Accessibility}"
+                        items="{
+                            path: '/AccessibilityVH'
+                            }">
+                    <core:Item key="{AccessID}" text="{Description}" />
+                </ComboBox>
                 </VBox>      
                 </HBox>
                 <HBox id="hboxDates" class="sapUiSmallMarginTop">
