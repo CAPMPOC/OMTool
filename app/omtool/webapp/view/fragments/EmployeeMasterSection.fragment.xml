@@ -1,100 +1,137 @@
 <core:FragmentDefinition
     xmlns="sap.m"
     xmlns:core="sap.ui.core"
-    xmlns:smartTable="sap.ui.comp.smarttable">
+    xmlns:smartFilterBar="sap.ui.comp.smartfilterbar"
+    xmlns:smartTable="sap.ui.comp.smarttable"
+    xmlns:f="sap.f"
+    xmlns:layout="sap.ui.layout">
     
     <VBox id="employeeMasterSection" visible="{viewModel>/showEmployeeMaster}">
         
-        <!-- Filter Bar Fragment -->
-        <core:Fragment fragmentName="com.sap.omtool.omtool.view.fragments.FilterBar" type="XML"/>
-        
-        <!-- Smart Table -->
-        <smartTable:SmartTable
-            id="smartTable"
-            entitySet="EmployeeHeader"
-            smartFilterId="smartFilterBar"
-            tableType="ResponsiveTable"
-            useExportToExcel="true"
-            useVariantManagement="true"
-            useTablePersonalisation="true"
-            header="Employee Data"
-            showRowCount="true"
-            persistencyKey="EmployeeHeaderSmartTable"
-            enableAutoBinding="true"
-            demandPopin="true"
-            class="sapUiResponsiveContentPadding">
+        <!-- Header Panel with Filter Bar -->
+        <Panel 
+            id="filterPanelEmployeeMaster"
+            expandable="false"
+            expanded="true"
+            backgroundDesign="Solid"
+            class="sapUiNoContentPadding">
             
-            <smartTable:customToolbar>
-                <OverflowToolbar id="_toolBar" design="Transparent">
-                    <ToolbarSpacer id="IdToolBar"/>
-                    <Button 
-                        id="_addEmpBtn" 
-                        class="sapUiSmallMargin" 
-                        icon="sap-icon://add-employee" 
-                        type="Default"
-                        text="Add Employee" 
-                        press="onAddEmployee"/>
-                </OverflowToolbar>
-            </smartTable:customToolbar>
-            <Table id="innerTable" mode="None">
-        <columns>
-            <!-- Actions Column -->
-            <Column 
-                width="8em" 
-                hAlign="Center"
-                demandPopin="false">
-                <customData>
-                    <core:CustomData 
-                        key="p13nData" 
-                        value='\{"columnKey":"Actions", "columnIndex":"999"}' />
-                </customData>
-                <Text text="Actions"/>
-            </Column>
-        </columns>
+            <!-- Smart Filter Bar -->
+            <smartFilterBar:SmartFilterBar
+                id="smartFilterBar"
+                entitySet="EmployeeHeader"
+                persistencyKey="EmployeeHeaderSmartFilterBar"
+                useProvidedNavigationProperties="false"
+                enableBasicSearch="true"
+                showClearOnFB="true"
+                showRestoreOnFB="true"
+                showGoOnFB="true"
+                showFilterConfiguration="true"
+                filterBarExpanded="true"
+                considerGroupTitle="true"
+                header=""
+                search="onSmartFilterBarSearch"
+                filterChange="onFilterChange">
+                
+                <smartFilterBar:layoutData>
+                    <FlexItemData growFactor="1" />
+                </smartFilterBar:layoutData>
+                
+            </smartFilterBar:SmartFilterBar>
+            
+        </Panel>
+        
+        <!-- Spacer -->
+        <VBox height="0.5rem"/>
+        
+        <!-- Smart Table with Card-like appearance -->
+        <Panel
+            id="tablePanel"
+            expandable="false"
+            expanded="true"
+            backgroundDesign="Solid"
+            class="sapUiNoContentPadding">
+            
+            <smartTable:SmartTable
+                id="smartTable"
+                entitySet="EmployeeHeader"
+                smartFilterId="smartFilterBar"
+                tableType="ResponsiveTable"
+                useExportToExcel="true"
+                useVariantManagement="true"
+                useTablePersonalisation="true"
+                header="Employee Data"
+                showRowCount="true"
+                persistencyKey="EmployeeHeaderSmartTable"
+                enableAutoBinding="true"
+                demandPopin="true"
+                showFullScreenButton="true"
+                beforeRebindTable="onBeforeRebindTable"
+                class="sapUiResponsiveContentPadding">
+                
+                <smartTable:customToolbar>
+                    <OverflowToolbar id="_toolBar" design="Transparent" style="Clear">
+                        <ToolbarSpacer id="IdToolBar"/>
+                        <Button 
+                            id="_addEmpBtn" 
+                            icon="sap-icon://add-employee" 
+                            type="Emphasized"
+                            text="Add Employee" 
+                            press="onAddEmployee"/>
+                    </OverflowToolbar>
+                </smartTable:customToolbar>
+                
+                <Table 
+                    id="innerTable" 
+                    mode="None"
+                    growing="true"
+                    growingThreshold="20"
+                    growingScrollToLoad="false"
+                    alternateRowColors="true"
+                    sticky="ColumnHeaders,HeaderToolbar">
+                    
+                    <columns>
+                        <!-- Actions Column - Fixed at the beginning -->
+                        <Column 
+                            width="6rem" 
+                            hAlign="Center"
+                            demandPopin="false"
+                            importance="High">
+                            <customData>
+                                <core:CustomData 
+                                    key="p13nData" 
+                                    value='\{"columnKey":"Actions", "columnIndex":"0", "leadingProperty":"Actions"}' />
+                            </customData>
+                            <Label text="Actions" design="Bold"/>
+                        </Column>
+                    </columns>
 
-        <items>
-            <ColumnListItem>
-                <cells>
-                    <!-- Actions Cell -->
-                    <HBox 
-    justifyContent="Center" 
-    class="sapUiTinyMarginBeginEnd">
-    <core:Icon
-        src="sap-icon://show"
-        color="#0a6ed1"
-        press="onViewEmployee"
-        class="sapUiSmallMarginEnd sapUiTinyMarginTop"
-        tooltip="View">
-        <core:layoutData>
-            <FlexItemData growFactor="0"/>
-        </core:layoutData>
-    </core:Icon>
-    <core:Icon
-        src="sap-icon://edit"
-        color="#0854a0"
-        press="onEdit"
-        class="sapUiSmallMarginEnd sapUiTinyMarginTop"
-        tooltip="Edit">
-        <core:layoutData>
-            <FlexItemData growFactor="0"/>
-        </core:layoutData>
-    </core:Icon>
-    <!-- <core:Icon
-        src="sap-icon://delete"
-        color="#bb0000"
-        press="onDelete"
-        class="sapUiTinyMarginTop"
-        tooltip="Delete">
-        <core:layoutData>
-            <FlexItemData growFactor="0"/>
-        </core:layoutData>
-    </core:Icon> -->
-</HBox>
-                </cells>
-            </ColumnListItem>
-        </items>
-    </Table>
-        </smartTable:SmartTable>
+                    <items>
+                        <ColumnListItem type="Inactive">
+                            <cells>
+                                <!-- Actions Cell with improved styling -->
+                                <HBox 
+                                    justifyContent="Center" 
+                                    alignItems="Center">
+                                    <Button
+                                        icon="sap-icon://display"
+                                        type="Transparent"
+                                        press="onViewEmployee"
+                                        tooltip="View Details"
+                                        class="sapUiTinyMarginEnd"/>
+                                    <Button
+                                        icon="sap-icon://edit"
+                                        type="Transparent"
+                                        press="onEdit"
+                                        tooltip="Edit Employee"/>
+                                </HBox>
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+            </smartTable:SmartTable>
+            
+        </Panel>
         
     </VBox>
     
