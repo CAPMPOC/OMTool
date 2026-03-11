@@ -197,7 +197,11 @@
                             required="true" />
                         <Input
                             id="sapExperience"
-                            value="{employee>/SAP}"
+                            value="{
+                                path: 'employee>/SAP',
+                                type: 'sap.ui.model.type.Integer'
+                            }"
+                            type="Number"
                             width="100%" />
                     </VBox>
                     
@@ -208,8 +212,12 @@
                         <Label
                             text="Non-SAP Experience" />
                         <Input
-                            value="{employee>/NonSAP}"
-                            width="100%"  />
+                            value="{
+                                path: 'employee>/NonSAP',
+                                type: 'sap.ui.model.type.Integer'
+                            }"
+                            type="Number"
+                            width="100%" />
                     </VBox>
 
                     <VBox

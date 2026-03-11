@@ -10,7 +10,7 @@ sap.ui.define([
 
     EmployeeService.prototype = {
         /**
-         * Create and save employee (create draft, prepare, activate)
+         * Create and save employee (create draft, prepare, activate in single batch)
          * @param {object} oModel - OData model
          * @param {object} oEmployeeData - Employee form data
          * @returns {Promise} - Promise resolving on success
@@ -32,15 +32,16 @@ sap.ui.define([
                             return;
                         }
 
-                        that._prepareDraft(sEmployeeId)
-                            .then(function () {
-                                return that._activateDraft(sEmployeeId);
+                        // Execute prepare and activate in SINGLE batch
+                        that._oODataService.executeDraftOperations(sEmployeeId)
+                            .then(function (oResult) {
+                                console.log("Employee saved successfully (draft prepared and activated)");
+                                resolve(oResult);
                             })
-                            .then(function () {
-                                console.log("Employee saved successfully");
-                                resolve();
-                            })
-                            .catch(reject);
+                            .catch(function(oError) {
+                                console.error("Draft operations failed:", oError);
+                                reject(oError);
+                            });
                     },
                     error: function (oError) {
                         console.error("Create draft error:", oError);
@@ -56,35 +57,6 @@ sap.ui.define([
          */
         loadAccessibilityData: function () {
             return this._oODataService.readEntitySet(Constants.ENTITY_SETS.ACCESSIBILITY_VH);
-        },
-
-        /**
-         * Prepare draft for employee
-         * @private
-         * @param {string} sEmployeeId - Employee ID
-         * @returns {Promise}
-         */
-        _prepareDraft: function (sEmployeeId) {
-            var sPath = EmployeeHelper.buildDraftPreparePath(sEmployeeId);
-            var oPayload = { SideEffectsQualifier: "" };
-
-            console.log("Preparing draft for:", sEmployeeId);
-
-            return this._oODataService.createEntity(sPath, oPayload);
-        },
-
-        /**
-         * Activate draft for employee
-         * @private
-         * @param {string} sEmployeeId - Employee ID
-         * @returns {Promise}
-         */
-        _activateDraft: function (sEmployeeId) {
-            var sPath = EmployeeHelper.buildDraftActivatePath(sEmployeeId);
-
-            console.log("Activating draft for:", sEmployeeId);
-
-            return this._oODataService.createEntity(sPath);
         },
 
         /**
