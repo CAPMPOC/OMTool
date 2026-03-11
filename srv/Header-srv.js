@@ -103,16 +103,18 @@ module.exports = cds.service.impl(async function () {
     // Use 'before' instead of 'on' to avoid UPDATE issues
 
     this.before('NEW', EmployeeHeader.drafts, async (req) => {
-        // Set defaults for new draft - these will be applied during draft creation
-        req.data.ktStarted = true;
-        req.data.isNewRecord = true;
-        req.data.RollOnDate = getTodayDate();
-        req.data.Staff_RollOffStatus = false;
-        req.data.handoverKtBegun = false;
-        req.data.NonSAP = 0;
-        req.data.SAP = 0;
+        // Set defaults ONLY if values are not provided
+        req.data.ktStarted = req.data.ktStarted ?? true;
+        req.data.isNewRecord = req.data.isNewRecord ?? true;
+        req.data.RollOnDate = req.data.RollOnDate || getTodayDate();
+        req.data.Staff_RollOffStatus = req.data.Staff_RollOffStatus ?? false;
+        req.data.handoverKtBegun = req.data.handoverKtBegun ?? false;
 
-        console.log(`[BEFORE NEW DRAFT] Setting defaults - RollOnDate: ${req.data.RollOnDate}, ktStarted: ${req.data.ktStarted}`);
+        // ✅ ONLY set to 0 if not provided or null/undefined
+        req.data.NonSAP = req.data.NonSAP ?? 0;
+        req.data.SAP = req.data.SAP ?? 0;
+
+        console.log(`[BEFORE NEW DRAFT] Setting defaults - RollOnDate: ${req.data.RollOnDate}, ktStarted: ${req.data.ktStarted}, NonSAP: ${req.data.NonSAP}, SAP: ${req.data.SAP}`);
     });
 
     // ==================== BEFORE CREATE HANDLER ====================
@@ -120,16 +122,18 @@ module.exports = cds.service.impl(async function () {
     this.before('CREATE', EmployeeHeader, async (req) => {
         const data = req.data;
 
-        // Ensure defaults for new records
-        data.ktStarted = true;
-        data.isNewRecord = true;
+        // Ensure defaults for new records - DON'T OVERWRITE existing values
+        data.ktStarted = data.ktStarted ?? true;
+        data.isNewRecord = data.isNewRecord ?? true;
         data.RollOnDate = data.RollOnDate || getTodayDate();
         data.Staff_RollOffStatus = data.Staff_RollOffStatus ?? false;
         data.handoverKtBegun = data.handoverKtBegun ?? false;
+
+        // ✅ Only default to 0 if not provided
         data.NonSAP = data.NonSAP ?? 0;
         data.SAP = data.SAP ?? 0;
 
-        console.log(`[CREATE] New employee - ktStarted: ${data.ktStarted}, isNewRecord: ${data.isNewRecord}, RollOnDate: ${data.RollOnDate}`);
+        console.log(`[CREATE] New employee - NonSAP: ${data.NonSAP}, SAP: ${data.SAP}, ktStarted: ${data.ktStarted}, isNewRecord: ${data.isNewRecord}, RollOnDate: ${data.RollOnDate}`);
     });
 
     // ==================== BEFORE SAVE HANDLER ====================
