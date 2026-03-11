@@ -52,10 +52,24 @@
                 <VBox id="vboxLocation" width="48%" class="sapUiSmallMarginEnd">
                     <Label id="lblLocation" text="Employee Location"/>
                     <Input 
-                        id="inputLocation" 
-                        value="{employee>/location}"
+                        id="inputEmployeeLocation" 
+                        value="{employee>/locationDesc}"
                         width="100%"
-                        placeholder=""/>
+                        placeholder="Select Location"
+                        showClearIcon="true"
+                        showValueHelp="true"
+                        valueHelpRequest=".onEmployeeLocationValueHelp"
+                        showSuggestion="true"
+                        suggestionItems="{path: '/LocationVH'}"
+                        suggest=".onEmployeeLocationSuggest"
+                        suggestionItemSelected=".onEmployeeLocationSuggestionSelected"
+                        change=".onEmployeeLocationChange">
+                        <suggestionItems>
+                            <core:Item 
+                                key="{LocID}" 
+                                text="{LocDesc}"/>
+                    </suggestionItems>
+                </Input>
                 </VBox>
 
                 <VBox id="vboxCuserId" width="48%" class="sapUiSmallMarginEnd">

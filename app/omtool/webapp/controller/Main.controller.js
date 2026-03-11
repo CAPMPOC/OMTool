@@ -11,7 +11,7 @@ sap.ui.define([
     "use strict";
 
     return BaseController.extend("com.sap.omtool.omtool.controller.Main", {
-        
+
         onInit: function () {
             // Initialize view model for section visibility
             var oViewModel = new JSONModel({
@@ -55,7 +55,7 @@ sap.ui.define([
         onSegmentedButtonChange: function (oEvent) {
             var sSelectedKey = this.byId("navSegmentedButton").getSelectedKey()
             var oViewModel = this.getView().getModel("viewModel");
-            
+
             // Toggle visibility based on selected button
             if (sSelectedKey === "employeeMaster") {
                 oViewModel.setProperty("/showEmployeeMaster", true);
@@ -226,6 +226,156 @@ sap.ui.define([
 
                 // Apply filters (will remove location filter)
                 this._applyFiltersToSmartTable();
+            }
+        },
+
+        // ==========================================
+        // EMPLOYEE LOCATION VALUE HELP METHODS
+        // (For Add Employee Dialog - No Filtering)
+        // ==========================================
+
+        /**
+         * Handle suggestion event for Employee Location input
+         * @param {sap.ui.base.Event} oEvent - Suggest event
+         */
+        onEmployeeLocationSuggest: function (oEvent) {
+            var sValue = oEvent.getParameter("suggestValue");
+            var aFilters = [];
+
+            if (sValue) {
+                // Filter suggestions based on user input
+                aFilters = [
+                    new Filter({
+                        filters: [
+                            new Filter("LocDesc", FilterOperator.Contains, sValue),
+                            new Filter("LocID", FilterOperator.Contains, sValue)
+                        ],
+                        and: false
+                    })
+                ];
+            }
+
+            // Apply filters to suggestion items
+            var oInput = oEvent.getSource();
+            var oBinding = oInput.getBinding("suggestionItems");
+
+            if (oBinding) {
+                oBinding.filter(aFilters);
+            }
+        },
+
+        /**
+         * Handle suggestion item selected for Employee Location
+         * @param {sap.ui.base.Event} oEvent - Selection event
+         */
+        onEmployeeLocationSuggestionSelected: function (oEvent) {
+            var oSelectedItem = oEvent.getParameter("selectedItem");
+
+            if (oSelectedItem) {
+                var sLocationID = oSelectedItem.getKey();
+                var sLocationText = oSelectedItem.getText();
+
+                // Update the employee model with both ID and description
+                var oEmployeeModel = this.getView().getModel("employee");
+                oEmployeeModel.setProperty("/location", sLocationID);
+                oEmployeeModel.setProperty("/locationDesc", sLocationText);
+
+                console.log("Employee Location selected from suggestion - ID:", sLocationID, "Text:", sLocationText);
+            }
+        },
+
+        /**
+         * Handle Value Help Request for Employee Location
+         * @param {sap.ui.base.Event} oEvent - Value help request event
+         */
+        onEmployeeLocationValueHelp: function (oEvent) {
+            var oView = this.getView();
+
+            // Create dialog lazily
+            if (!this._employeeLocationDialog) {
+                Fragment.load({
+                    id: oView.getId(),
+                    name: "com.sap.omtool.omtool.view.fragments.EmployeeLocationValueHelp",
+                    controller: this
+                }).then(function (oDialog) {
+                    this._employeeLocationDialog = oDialog;
+                    oView.addDependent(this._employeeLocationDialog);
+                    this._employeeLocationDialog.open();
+                }.bind(this));
+            } else {
+                this._employeeLocationDialog.open();
+            }
+        },
+
+        /**
+         * Handle search in Employee Location Value Help dialog
+         * @param {sap.ui.base.Event} oEvent - Search event
+         */
+        onEmployeeLocationSearch: function (oEvent) {
+            var sValue = oEvent.getParameter("value");
+            var oFilter = new Filter({
+                filters: [
+                    new Filter("LocDesc", FilterOperator.Contains, sValue),
+                    new Filter("LocID", FilterOperator.Contains, sValue)
+                ],
+                and: false
+            });
+
+            var oBinding = oEvent.getSource().getBinding("items");
+            oBinding.filter([oFilter]);
+        },
+
+        /**
+         * Handle confirm in Employee Location Value Help dialog
+         * @param {sap.ui.base.Event} oEvent - Confirm event
+         */
+        onEmployeeLocationDialogConfirm: function (oEvent) {
+            var oSelectedItem = oEvent.getParameter("selectedItem");
+
+            if (oSelectedItem) {
+                var sLocationText = oSelectedItem.getTitle();
+                var sLocationID = oSelectedItem.getDescription();
+
+                // Update the employee model with both ID and description
+                var oEmployeeModel = this.getView().getModel("employee");
+                oEmployeeModel.setProperty("/location", sLocationID);
+                oEmployeeModel.setProperty("/locationDesc", sLocationText);
+
+                // Also update the input field directly
+                var oLocationInput = this.byId("inputEmployeeLocation");
+                if (oLocationInput) {
+                    oLocationInput.setValue(sLocationText);
+                }
+
+                console.log("Employee Location selected from dialog - ID:", sLocationID, "Text:", sLocationText);
+            }
+
+            // Clear the search filter
+            oEvent.getSource().getBinding("items").filter([]);
+        },
+
+        /**
+         * Handle cancel in Employee Location Value Help dialog
+         * @param {sap.ui.base.Event} oEvent - Cancel event
+         */
+        onEmployeeLocationDialogCancel: function (oEvent) {
+            // Clear the search filter
+            oEvent.getSource().getBinding("items").filter([]);
+        },
+
+        /**
+         * Handle change in Employee Location input (for manual entry or clearing)
+         * @param {sap.ui.base.Event} oEvent - Change event
+         */
+        onEmployeeLocationChange: function (oEvent) {
+            var sValue = oEvent.getParameter("value");
+            var oEmployeeModel = this.getView().getModel("employee");
+
+            // If input is cleared, reset the stored values
+            if (!sValue || sValue.trim() === "") {
+                oEmployeeModel.setProperty("/location", "");
+                oEmployeeModel.setProperty("/locationDesc", "");
+                console.log("Employee Location cleared");
             }
         },
 
@@ -403,7 +553,8 @@ sap.ui.define([
                     Empid: "",
                     firstName: "",
                     lastName: "",
-                    location: "",
+                    location: "",       // This stores the LocID for backend
+                    locationDesc: "",      // This stores the LocDesc for display
                     CID: "",
                     ProductGroup: "",
                     ServiceGroup: "",
@@ -415,16 +566,33 @@ sap.ui.define([
                     SAP: 0,
                     NonSAP: 0,
                     SAPToday: '',
-                    Skill_SkillID:"",
+                    Skill_SkillID: "",
                     statusRollOffStarted: false,
                     statusHandoverKTBegun: false
                 };
-                
+
                 const oEmployeeModel = new sap.ui.model.json.JSONModel(oEmptyEmployee);
                 this.getView().setModel(oEmployeeModel, "employee");
-                
+
+                // Reset dialog fields
+                this._resetDialogFields();
+
                 oDialog.open();
             }.bind(this));
+        },
+
+        /**
+        * Reset all input fields in the Add Employee dialog
+        * @private
+        */
+        _resetDialogFields: function () {
+            // Clear location input
+            var oLocationInput = this.byId("inputEmployeeLocation");
+            if (oLocationInput) {
+                oLocationInput.setValue("");
+            }
+
+            // Add other fields here if needed
         },
 
         onAddEmployeePress: async function () {
@@ -432,36 +600,36 @@ sap.ui.define([
                 const oView = this.getView();
                 const oEmployeeModel = oView.getModel("employee");
                 const oEmployeeData = oEmployeeModel.getData();
-                
+
                 // Validate required fields
                 if (!this._validateEmployeeData(oEmployeeData)) {
                     MessageBox.error("Please fill all required fields:\n- Employee ID\n- First Name\n- Last Name\n- Kick-off Date\n- SAP Experience");
                     return;
                 }
-                
+
                 // Show busy indicator
                 const oDialog = this.byId("employeeDialog");
                 oDialog.setBusy(true);
-                
+
                 const oModel = this.getView().getModel(); // Your OData V2 model
-                
+
                 // Execute batch operation
                 await this._createAndSaveEmployee(oModel, oEmployeeData);
-                
+
                 // Success - close dialog and refresh
                 oDialog.setBusy(false);
-                
+
                 MessageBox.success("Employee saved successfully", {
-                    onClose: function() {
+                    onClose: function () {
                         this._closeDialog();
                         this._refreshMainView();
                     }.bind(this)
                 });
-                
+
             } catch (error) {
                 MessageBox.error("Error saving employee: " + (error.message || "Unknown error"));
                 console.error("Save employee error:", error);
-                
+
                 const oDialog = this.byId("employeeDialog");
                 if (oDialog) {
                     oDialog.setBusy(false);
@@ -469,18 +637,18 @@ sap.ui.define([
             }
         },
 
-        _validateEmployeeData: function(oData) {
+        _validateEmployeeData: function (oData) {
             // Validate required fields
             return !!(
-                oData.Empid && 
-                oData.firstName && 
-                oData.lastName && 
+                oData.Empid &&
+                oData.firstName &&
+                oData.lastName &&
                 oData.rollOnDate &&
                 oData.SAP
             );
         },
 
-        _prepareEmployeePayload: function(oEmployeeData) {
+        _prepareEmployeePayload: function (oEmployeeData) {
             // Map frontend model to backend entity structure
             return {
                 Empid: oEmployeeData.Empid.trim(),
@@ -505,49 +673,49 @@ sap.ui.define([
             };
         },
 
-        _formatDate: function(sDate) {
+        _formatDate: function (sDate) {
             // Ensure date is in correct format for backend
             if (!sDate) return null;
-            
+
             // If it's already a Date object
             if (sDate instanceof Date) {
                 return sDate.toISOString().split('T')[0];
             }
-            
+
             // If it's a string in yyyy-MM-dd format, return as is
             if (typeof sDate === 'string' && sDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
                 return sDate;
             }
-            
+
             // Try to parse and format
             const oDate = new Date(sDate);
             if (!isNaN(oDate.getTime())) {
                 return oDate.toISOString().split('T')[0];
             }
-            
+
             return null;
         },
 
-        _createAndSaveEmployee: function(oModel, oEmployeeData) {
+        _createAndSaveEmployee: function (oModel, oEmployeeData) {
             return new Promise((resolve, reject) => {
                 const oPayload = this._prepareEmployeePayload(oEmployeeData);
-                
+
                 console.log("Creating employee with payload:", oPayload);
-                
+
                 // Store the employee ID for later use
                 let sCreatedEmployeeId = null;
-                
+
                 // Create the draft entry
                 oModel.create("/EmployeeHeader", oPayload, {
-                    success: function(oCreatedData) {
+                    success: function (oCreatedData) {
                         console.log("Draft created successfully:", oCreatedData);
                         sCreatedEmployeeId = oCreatedData.ID;
-                        
+
                         if (!sCreatedEmployeeId) {
                             reject(new Error("No ID returned from create operation"));
                             return;
                         }
-                        
+
                         // Now prepare and activate the draft using POST
                         this._prepareDraftPost(oModel, sCreatedEmployeeId)
                             .then(() => {
@@ -561,12 +729,12 @@ sap.ui.define([
                                 console.error("Error in draft prepare/activate:", error);
                                 reject(error);
                             });
-                            
+
                     }.bind(this),
-                    error: function(oError) {
+                    error: function (oError) {
                         console.error("Create draft error:", oError);
                         let sErrorMsg = "Failed to create employee entry";
-                        
+
                         try {
                             if (oError.responseText) {
                                 const oErrorResponse = JSON.parse(oError.responseText);
@@ -575,21 +743,21 @@ sap.ui.define([
                         } catch (e) {
                             console.error("Error parsing error response:", e);
                         }
-                        
+
                         reject(new Error(sErrorMsg));
                     }
                 });
             });
         },
 
-        _prepareDraftPost: function(oModel, sEmployeeId) {
+        _prepareDraftPost: function (oModel, sEmployeeId) {
             return new Promise((resolve, reject) => {
                 // Use POST to call the bound action
                 const sPath = `/EmployeeHeader(ID=${sEmployeeId},IsActiveEntity=false)/OMTSrv.draftPrepare`;
                 const oPayload = {
                     SideEffectsQualifier: ""
                 };
-                
+
                 console.log("Preparing draft for:", sEmployeeId);
                 console.log("POST path:", sPath);
 
@@ -603,7 +771,7 @@ sap.ui.define([
             });
         },
 
-        _activateDraftPost: function(oModel, sEmployeeId) {
+        _activateDraftPost: function (oModel, sEmployeeId) {
             return new Promise((resolve, reject) => {
                 // Use POST to call the bound action
                 const aSelects = [
@@ -615,17 +783,17 @@ sap.ui.define([
                     "Staff_RollOffReasons", "Staff_RollOffStatus", "handoverKtBegun",
                     "isNewRecord", "ktStarted"
                 ];
-                
+
                 const sExpand = "Accessibility($select=AccessID,Description)," +
-                               "DraftAdministrativeData($select=DraftIsCreatedByMe,DraftUUID,InProcessByUser)," +
-                               "Location($select=LocDesc,LocID)";
-                
+                    "DraftAdministrativeData($select=DraftIsCreatedByMe,DraftUUID,InProcessByUser)," +
+                    "Location($select=LocDesc,LocID)";
+
                 const sPath = `/EmployeeHeader(ID=${sEmployeeId},IsActiveEntity=false)/OMTSrv.draftActivate` +
-                             `?$select=${aSelects.join(",")}&$expand=${sExpand}`;
-                
+                    `?$select=${aSelects.join(",")}&$expand=${sExpand}`;
+
                 console.log("Activating draft for:", sEmployeeId);
                 console.log("POST path:", sPath);
-                
+
                 this.oODataService.createEntity(sPath)
                     .then((oData) => {
                         resolve(oData)
@@ -636,20 +804,20 @@ sap.ui.define([
             });
         },
 
-        _closeDialog: function() {
+        _closeDialog: function () {
             const oDialog = this.byId("employeeDialog");
             if (oDialog) {
                 oDialog.close();
             }
         },
 
-        _refreshMainView: function() {
+        _refreshMainView: function () {
             // Refresh your SmartTable
             const oSmartTable = this.byId("smartTable"); // Replace with your actual SmartTable ID
             if (oSmartTable) {
                 oSmartTable.rebindTable();
             }
-            
+
             // Also refresh the model to ensure data is up-to-date
             const oModel = this.getView().getModel();
             if (oModel) {
@@ -657,17 +825,17 @@ sap.ui.define([
             }
         },
 
-        onCancelEmployee: function() {
+        onCancelEmployee: function () {
             // Optional: Show confirmation dialog if data was entered
             const oEmployeeModel = this.getView().getModel("employee");
             const oData = oEmployeeModel.getData();
-            
+
             const bHasData = !!(oData.Empid || oData.firstName || oData.lastName);
-            
+
             if (bHasData) {
                 MessageBox.confirm("Are you sure you want to cancel? All entered data will be lost.", {
                     title: "Confirm Cancel",
-                    onClose: function(sAction) {
+                    onClose: function (sAction) {
                         if (sAction === MessageBox.Action.OK) {
                             this._closeDialog();
                         }
