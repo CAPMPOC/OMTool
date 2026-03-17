@@ -1,0 +1,351 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:l="sap.ui.layout">
+
+    <Dialog
+        id="editEmployeeDialog"
+        title="Edit Employee"
+        contentWidth="500px"
+        contentHeight="auto"
+        resizable="false"
+        draggable="true">
+
+        <content>
+            <VBox class="sapUiSmallMarginBegin sapUiSmallMarginTop">
+                <Title  
+                        text="Basic Information" 
+                        level="H4"
+                        class="sapUiSmallMarginBottom"/>
+                
+                <!-- Employee ID -->
+                <VBox class="sapUiSmallMarginBottom">
+                    <Label text="Employee ID" required="true"/>
+                    <Input 
+                        id="editEmpId"
+                        value="{editEmployee>/Empid}"
+                        width="98%"
+                        placeholder="Enter Employee ID" 
+                        enabled="false"/>
+                </VBox>
+                
+                <HBox class="sapUiSmallMarginBottom">
+                    <VBox class="sapUiSmallMarginEnd" width="48%">
+                        <Label text="First Name" required="true"/>
+                        <Input 
+                            id="editFirstName"
+                            value="{editEmployee>/FirstName}"
+                            width="100%"
+                            placeholder="Enter First Name"
+                            valueLiveUpdate="true"
+                            change=".onEmployeeFieldChange"
+                            valueStateText="First Name is required">
+                            <customData>
+                                <core:CustomData key="fieldName" value="FirstName"/>
+                            </customData>
+                        </Input>
+                    </VBox>
+                    <VBox class="sapUiSmallMarginEnd" width="48%">
+                        <Label text="Last Name" required="true"/>
+                        <Input
+                            id="editLastName"
+                            value="{editEmployee>/LastName}"
+                            width="100%"
+                            placeholder="Enter Last Name"
+                            valueLiveUpdate="true"
+                            change=".onEmployeeFieldChange"
+                            valueStateText="Last Name is required">
+                            <customData>
+                                <core:CustomData key="fieldName" value="LastName"/>
+                            </customData>
+                        </Input>
+                    </VBox>
+                </HBox>
+                
+                <!-- Location and C-User ID -->
+                <HBox>
+                    <VBox id="vboxeditLocation" width="48%" class="sapUiSmallMarginEnd">
+                        <Label id="lbleditLocation" text="Employee Location" required="true"/>
+                        <Input 
+                            id="inputEditEmployeeLocation" 
+                            value="{editEmployee>/Location_LocID}"
+                            width="100%"
+                            placeholder="Select Location"
+                            showClearIcon="true"
+                            showValueHelp="true"
+                            valueHelpRequest=".onEmployeeLocationValueHelp"
+                            showSuggestion="true"
+                            suggestionItems="{path: '/LocationVH'}"
+                            suggest=".onEmployeeLocationSuggest"
+                            suggestionItemSelected=".onEmployeeLocationSuggestionSelected"
+                            change=".onEmployeeLocationChangeWithUpdate">
+                            
+                            <suggestionItems>
+                                <core:Item 
+                                    key="{LocID}" 
+                                    text="{LocDesc}"/>
+                            </suggestionItems>
+                        </Input>
+                    </VBox>
+
+                    <VBox width="48%" class="sapUiSmallMarginEnd">
+                        <Label text="C-User ID"/>
+                        <Input
+                            id="editCID"
+                            value="{editEmployee>/CID}"
+                            width="100%"
+                            placeholder="Enter C-User ID"
+                            change=".onEmployeeFieldChange">
+                            <customData>
+                                <core:CustomData key="fieldName" value="CID"/>
+                            </customData>
+                        </Input>
+                    </VBox>
+                </HBox>
+                
+                <!-- Assignment Section -->
+                <Title
+                        text="Assignment" 
+                        level="H4"
+                        class="sapUiSmallMarginBottom sapUiSmallMarginTop"/>
+
+                <!-- Employer Name -->
+                <VBox>
+                    <Label text="Employer Name" />
+                    <Input 
+                        id="editEmployer"
+                        class="sapUiSmallMarginBottom"
+                        value="{editEmployee>/Employer}"
+                        width="98%"
+                        placeholder="Enter Employer Name"
+                        change=".onEmployeeFieldChange">
+                        <customData>
+                            <core:CustomData key="fieldName" value="Employer"/>
+                        </customData>
+                    </Input>
+                </VBox>
+                
+                <HBox class="sapUiSmallMarginBottom">
+                    <VBox width="48%" class="sapUiSmallMarginEnd">
+                        <Label text="Product Group"/>
+                        <Input 
+                            id="editProductGroup"
+                            value="{editEmployee>/ProductGroup}"
+                            width="100%"
+                            placeholder="Enter Product Group"
+                            change=".onEmployeeFieldChange">
+                            <customData>
+                                <core:CustomData key="fieldName" value="ProductGroup"/>
+                            </customData>
+                        </Input>
+                    </VBox>
+
+                    <VBox width="48%" class="sapUiSmallMarginEnd">
+                        <Label text="Service Group"/>
+                        <Input 
+                            id="editServiceGroup"
+                            value="{editEmployee>/ServiceGroup}"
+                            width="100%"
+                            placeholder="Enter Service Group"
+                            change=".onEmployeeFieldChange">
+                            <customData>
+                                <core:CustomData key="fieldName" value="ServiceGroup"/>
+                            </customData>
+                        </Input>
+                    </VBox>
+                </HBox>
+
+                <HBox>
+                    <VBox width="48%" class="sapUiSmallMarginEnd">
+                        <Label text="Product"/>
+                        <Input 
+                            id="editProduct"
+                            value="{editEmployee>/Product}"
+                            width="100%"
+                            placeholder="Enter Product"
+                            change=".onEmployeeFieldChange">
+                            <customData>
+                                <core:CustomData key="fieldName" value="Product"/>
+                            </customData>
+                        </Input>
+                    </VBox>   
+
+                    <VBox id="vboxeditAccessibility" width="48%" class="sapUiSmallMarginEnd">
+                        <Label id="lbleditAccessibility" text="Position"/>
+                        <ComboBox
+                            id="PositionEditEmployee"
+                            placeholder="Position"
+                            width="240px"
+                            class="sapUiTinyMarginEnd"
+                            showClearIcon="true"
+                            selectedKey="{editEmployee>/Accessibility_AccessID}"
+                            selectionChange=".onEmployeeFieldChange"
+                            items="{path: '/AccessibilityVH'}">
+                            <customData>
+                                <core:CustomData key="fieldName" value="Accessibility_AccessID"/>
+                            </customData>
+                            <core:Item key="{AccessID}" text="{Description}" />
+                        </ComboBox>
+                    </VBox>        
+                </HBox>
+                
+                <HBox class="sapUiSmallMarginTop">
+                    <!-- Roll-On Date -->
+                    <VBox width="48%" class="sapUiSmallMarginEnd">
+                        <Label text="Roll-On Date" required="true"/>
+                        <DatePicker 
+                            id="editRollOnDate"
+                            value="{editEmployee>/RollOnDate}"
+                            valueFormat="yyyy-MM-dd"
+                            displayFormat="MM/dd/yyyy"
+                            width="100%"
+                            placeholder="mm/dd/yyyy"
+                            change=".onRollOnDateChangeWithUpdate">
+                            <customData>
+                                <core:CustomData key="fieldName" value="RollOnDate"/>
+                            </customData>
+                        </DatePicker>
+                    </VBox>
+                    
+                    <!-- Roll-off Date -->
+                    <VBox width="48%" class="sapUiSmallMarginEnd">
+                        <Label text="Roll-off Date"/>
+                        <DatePicker 
+                            id="editRollOffDate"
+                            value="{editEmployee>/RollOffDate}"
+                            valueFormat="yyyy-MM-dd"
+                            displayFormat="MM/dd/yyyy"
+                            width="100%"
+                            placeholder="mm/dd/yyyy"
+                            minDate="{editEmployee>/rollOnDate}"
+                            change=".onEmployeeFieldChange">
+                            <customData>
+                                <core:CustomData key="fieldName" value="RollOffDate"/>
+                            </customData>
+                        </DatePicker>
+                    </VBox>
+                </HBox>
+                
+                <!-- Experience Section -->
+                <Title text="Experience"
+                    level="H4"
+                    class="sapUiSmallMarginBottom sapUiSmallMarginTop" />
+                
+                <!-- SAP and Non-SAP Experience -->
+                <HBox class="sapUiSmallMarginBottom">
+                    <VBox width="30%" class="sapUiSmallMarginEnd">
+                        <Label text="SAP Experience" required="true" />
+                        <Input 
+                            id="editSAPExp"
+                            value="{editEmployee>/SAP}"
+                            width="100%"
+                            type="Number"
+                            placeholder="Years"
+                            liveChange=".onExperienceChange"
+                            change=".onEmployeeFieldChange">
+                            <customData>
+                                <core:CustomData key="fieldName" value="SAP"/>
+                            </customData>
+                        </Input>
+                    </VBox>
+                    
+                    <VBox width="30%" class="sapUiSmallMarginEnd">
+                        <Label text="Non-SAP Experience" />
+                        <Input 
+                            id="editNonSAPExp"
+                            value="{editEmployee>/NonSAP}"
+                            width="100%"
+                            type="Number"
+                            placeholder="Years"
+                            liveChange=".onExperienceChange"
+                            change=".onEmployeeFieldChange">
+                            <customData>
+                                <core:CustomData key="fieldName" value="NonSAP"/>
+                            </customData>
+                        </Input>
+                    </VBox>
+
+                    <VBox width="30%" class="sapUiSmallMarginEnd">
+                        <Label text="Total Experience" />
+                        <Input 
+                            id="editTotalExp"
+                            value="{editEmployee>/SAPToday}"
+                            width="100%"
+                            placeholder="Auto-calculated"
+                            enabled="false"/>
+                    </VBox>
+                </HBox>
+                
+                <!-- Employee Skills -->
+                <VBox>
+                    <Label text="Employee Skills" />
+                    <Input 
+                        id="editSkills"
+                        value="{editEmployee>/Skill_SkillID}"
+                        width="98%"
+                        placeholder="Enter Skills (comma-separated)"
+                        change=".onEmployeeFieldChange">
+                        <customData>
+                            <core:CustomData key="fieldName" value="Skill_SkillID"/>
+                        </customData>
+                    </Input>
+                </VBox>
+                
+                <!-- Status Tracking Section -->
+                <VBox class="sapUiMediumMarginTop">
+                    <Title text="Status Tracking" level="H4"/>
+                    <HBox>
+                        <HBox justifyContent="Start"
+                            alignItems="Center"
+                            width="50%"
+                            class="sapUiSmallMarginTop">
+                            <Text text="New Employee" />
+                            <Switch
+                                id="editNewEmployeeSwitch"
+                                state="{editEmployee>/isNewEmployee}"
+                                customTextOn="Yes" 
+                                customTextOff="No"
+                                change=".onEmployeeFieldChange">
+                                <customData>
+                                    <core:CustomData key="fieldName" value="isNewRecord"/>
+                                </customData>
+                            </Switch>
+                        </HBox>
+                        
+                        <HBox justifyContent="Start"
+                            alignItems="Center"
+                            width="50%"
+                            class="sapUiSmallMarginTop">
+                            <Text text="Onboarding KT Begun" />
+                            <Switch 
+                                id="editOnboardingSwitch"
+                                state="{editEmployee>/onboardingKTBegun}"
+                                customTextOn="Yes" 
+                                customTextOff="No"
+                                change=".onEmployeeFieldChange">
+                                <customData>
+                                    <core:CustomData key="fieldName" value="handoverKtBegun"/>
+                                </customData>
+                            </Switch>
+                        </HBox>
+                    </HBox>
+                </VBox>
+            </VBox>
+        </content>
+        
+        <beginButton>
+            <Button
+                text="Save"
+                type="Emphasized"
+                press=".onSaveEmployeeEdit"
+                icon="sap-icon://save"/>
+        </beginButton>
+        <endButton>
+            <Button
+                text="Cancel"
+                press=".onCancelEmployeeEdit"
+                icon="sap-icon://decline"/>
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>

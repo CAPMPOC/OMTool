@@ -26,7 +26,7 @@ sap.ui.define([
                 SAP: this._parseInteger(oEmployeeData.SAP),           // ✅ Changed
                 NonSAP: this._parseInteger(oEmployeeData.NonSAP),     // ✅ Changed
                 SAPToday: this._parseInteger(oEmployeeData.SAPToday), // ✅ Changed
-                Skill_SkillID: this._trimString(oEmployeeData.Skill) || "",
+                Skill_SkillID: this._trimString(oEmployeeData.Skill_SkillID) || "",
                 Staff_RollOffStatus: oEmployeeData.statusRollOffStarted || false,
                 handoverKtBegun: oEmployeeData.statusHandoverKTBegun || false,
                 IsActiveEntity: false

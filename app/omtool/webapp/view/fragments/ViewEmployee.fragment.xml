@@ -28,15 +28,15 @@
                 
                 <HBox class="sapUiSmallMarginBottom">
                 <VBox class="sapUiSmallMarginEnd" width="48%">
-                    <Label text="First Name" required="true"/>
-                    <Input value="{viewEmployee>/firstName}"
+                    <Label  id="vboxvFirstName" text="First Name" required="true"/>
+                    <Input id="inputvFirstName" value="{viewEmployee>/FirstName}"
                         width="100%"
                         placeholder="" enabled="false"/>
                 </VBox>
                 <VBox class="sapUiSmallMarginEnd" width="48%">
                     <Label text="Last Name" required="true"/>
                     <Input
-                        value="{viewEmployee>/lastName}"
+                        value="{viewEmployee>/LastName}"
                         width="100%"
                         placeholder="" enabled="false"/>
                 </VBox>
@@ -47,7 +47,7 @@
                 <VBox width="48%" class="sapUiSmallMarginEnd">
                     <Label text="Location"/>
                     <Input
-                        value="{viewEmployee>/location}"
+                        value="{viewEmployee>/Location_LocID}"
                         width="100%"
                         placeholder="" enabled="false"/>
                 </VBox>
@@ -104,7 +104,7 @@
 
                 <VBox  width="48%" class="sapUiSmallMarginEnd">
                     <Label text="Accessibility"/>
-                    <Input value="{viewEmployee>/Accessibility}"
+                    <Input value="{viewEmployee>/Accessibility_AccessID}"
                         width="100%"
                         placeholder="" enabled="false"/>
                 </VBox>      
@@ -115,7 +115,7 @@
                     <VBox width="48%" class="sapUiSmallMarginEnd">
                     
                         <Label text="Roll-On Date" required="true"/>
-                        <DatePicker value="{viewEmployee>/rollOnDate}"
+                        <DatePicker value="{viewEmployee>/RollOnDate}"
                             valueFormat="yyyy-MM-dd"
                             displayFormat="MM/dd/yyyy"
                             width="100%"
@@ -126,7 +126,7 @@
                     <!-- Roll-off Date -->
                     <VBox width="48%" class="sapUiSmallMarginEnd">
                         <Label text="Roll-off Date"/>
-                        <DatePicker value="{viewEmployee>/rollOffDate}"
+                        <DatePicker value="{viewEmployee>/RollOffDate}"
                             valueFormat="yyyy-MM-dd"
                             displayFormat="MM/dd/yyyy"
                             width="100%"
@@ -193,7 +193,7 @@
                         class="sapUiSmallMarginTop">
                         <Text text="New Employee" />
                         <Switch
-                            state="true"  customTextOn="Yes" customTextOff="No" enabled="false"/>
+                            state="{viewEmployee>/isNewRecord}"  customTextOn="Yes" customTextOff="No" enabled="false"/>
                     </HBox>
                     
                     <HBox justifyContent="Start"
@@ -201,7 +201,7 @@
                         width="50%"
                         class="sapUiSmallMarginTop">
                         <Text text="Onboarding KT Begun" />
-                        <Switch state="true"  customTextOn="Yes" customTextOff="No" enabled="false"/>
+                        <Switch state="{viewEmployee>/handoverKtBegun}"  customTextOn="Yes" customTextOff="No" enabled="false"/>
                     </HBox>
                 </HBox>
                     
