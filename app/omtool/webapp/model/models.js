@@ -31,6 +31,7 @@ sap.ui.define([
             return oModel;
         },
 
+
         /**
          * Creates the report data model with default values.
          * @returns {sap.ui.model.json.JSONModel} The report data model.
@@ -49,13 +50,22 @@ sap.ui.define([
             return oModel;
         },
 
+        // createEditEmployeeModel: function () {
+        //     var oModel = new JSONModel();
+        //     return oModel;
+        // },
+
         /**
          * Creates an employee model with provided data (for view/edit).
          * @param {object} oEmployeeData - Employee data object
          * @returns {sap.ui.model.json.JSONModel} The employee model with data.
          */
         createEmployeeModelWithData: function (oEmployeeData) {
-            var oModel = new JSONModel(oEmployeeData || {});
+            // Ensure we have valid data
+            var oData = oEmployeeData || {};
+
+            // Create and return the JSONModel
+            var oModel = new JSONModel(oData);
             return oModel;
         },
 

@@ -236,17 +236,292 @@ sap.ui.define([
             }
 
             var oEmployeeData = oContext.getObject();
+            var oModel = models.createEmployeeModelWithData(oEmployeeData);
+
+            // Set model on view first
+            this.getView().setModel(oModel, "viewEmployee");
 
             this._oDialogManager.openDialog(
                 "viewEmployeeDialog",
                 Constants.FRAGMENTS.VIEW_EMPLOYEE,
-                models.createEmployeeModelWithData(oEmployeeData),
+                oModel,
                 "viewEmployee"
             );
         },
 
         onCloseviewEmployeeDetail: function () {
             this._oDialogManager.closeDialog("viewEmployeeDialog");
+        },
+
+        onEditEmployee: function (oEvent) {
+            var oButton = oEvent.getSource();
+            var oListItem = oButton.getParent().getParent();
+            var oBindingContext = oListItem.getBindingContext();
+
+            if (!oBindingContext) {
+                MessageBox.warning("Unable to retrieve employee data. Please try again.");
+                return;
+            }
+
+            var oSelectedEmployee = oBindingContext.getObject();
+            this._callDraftEdit(oSelectedEmployee);
+        },
+
+        _callDraftEdit: function (oEmployeeData) {
+            var oDataModel = this.getView().getModel();
+            this.getView().setBusy(true);
+            oDataModel.setDeferredGroups(["editGroup"]);
+
+            var sPath = "/EmployeeHeader(ID=" + oEmployeeData.ID + ",IsActiveEntity=true)/OMTSrv.draftEdit";
+            var oPayload = { PreserveChanges: true };
+
+            oDataModel.create(sPath, oPayload, {
+                groupId: "editGroup",
+                urlParameters: {
+                    "$select": "Accessibility_AccessID,CID,DraftMessages,Empid,Employer,FirstName,HasActiveEntity,HasDraftEntity,ID,IsActiveEntity,LastName,Location_LocID,NonSAP,Product,ProductGroup,RollOffDate,RollOffImpact_ROI,RollOnDate,SAP,SAPToday,ServiceGroup,Skill_SkillID,Staff_ReasonsRemarks,Staff_RollOffReasons,Staff_RollOffStatus,handoverKtBegun,isNewRecord,ktStarted",
+                    "$expand": "Accessibility($select=AccessID,Description),DraftAdministrativeData($select=DraftIsCreatedByMe,DraftUUID,InProcessByUser),Location($select=LocDesc,LocID)"
+                },
+                success: function (oData) {
+                    this.getView().setBusy(false);
+                    this._oDraftEmployee = oData;
+                    // Store draft path for later updates
+                    this._sDraftPath = "/EmployeeHeader(ID=" + oData.ID + ",IsActiveEntity=false)";
+                    this.openEditDialog(oData);
+                }.bind(this),
+                error: function (oError) {
+                    this.getView().setBusy(false);
+                    var sErrorMsg = this._extractErrorMessage(oError);
+                    MessageBox.error("Failed to create draft: " + sErrorMsg);
+                }.bind(this)
+            });
+
+            oDataModel.submitChanges({
+                groupId: "editGroup",
+                success: function () {
+                    console.log("Draft edit batch submitted successfully");
+                },
+                error: function (oError) {
+                    this.getView().setBusy(false);
+                    var sErrorMsg = this._extractErrorMessage(oError);
+                    MessageBox.error("Failed to submit draft edit: " + sErrorMsg);
+                }.bind(this)
+            });
+        },
+
+        openEditDialog: function (oEmployeeData) {
+            var oEditData = JSON.parse(JSON.stringify(oEmployeeData));
+            var oEditModel = models.createEmployeeModelWithData(oEditData);
+            this.getView().setModel(oEditModel, "editEmployee");
+
+            this._oDialogManager.openDialog(
+                "editEmployeeDialog",
+                Constants.FRAGMENTS.EDIT_EMPLOYEE,
+                oEditModel,
+                "editEmployee"
+            );
+        },
+
+        // NEW: Generic field change handler
+        onEmployeeFieldChange: function (oEvent) {
+            var oSource = oEvent.getSource();
+            var sFieldName = oSource.data("fieldName");
+
+            if (!sFieldName) {
+                console.warn("Field name not specified for auto-update");
+                return;
+            }
+
+            // Get the new value
+            var vNewValue = oSource.getValue ? oSource.getValue() :
+                oSource.getSelectedKey ? oSource.getSelectedKey() :
+                    oSource.getState ? oSource.getState() : null;
+
+            // Update the draft immediately
+            this._updateDraftField(sFieldName, vNewValue);
+        },
+
+        // NEW: Update draft field immediately
+        _updateDraftField: function (sFieldName, vValue) {
+            if (!this._sDraftPath) {
+                console.error("Draft path not available");
+                return;
+            }
+
+            var oDataModel = this.getView().getModel();
+            var oUpdatePayload = {};
+            oUpdatePayload[sFieldName] = vValue;
+
+            oDataModel.update(this._sDraftPath, oUpdatePayload, {
+                success: function () {
+                    console.log("Field '" + sFieldName + "' updated successfully in draft");
+                }.bind(this),
+                error: function (oError) {
+                    console.error("Failed to update field '" + sFieldName + "':", oError);
+                    var sErrorMsg = this._extractErrorMessage(oError);
+                    MessageBox.error("Failed to update " + sFieldName + ": " + sErrorMsg);
+                }.bind(this)
+            });
+        },
+
+        // MODIFIED: Save only executes prepare and activate
+        onSaveEmployeeEdit: function () {
+            var oEditModel = this.getView().getModel("editEmployee");
+
+            if (!oEditModel) {
+                MessageBox.error("Unable to retrieve employee data. Please try again.");
+                return;
+            }
+
+            if (!this._sDraftPath) {
+                MessageBox.error("Draft path is not available. Please try again.");
+                return;
+            }
+
+            var oDataModel = this.getView().getModel();
+            var oDialog = this._oDialogManager.getDialog("editEmployeeDialog");
+
+            if (oDialog) {
+                oDialog.setBusy(true);
+            }
+
+            // Set deferred groups for batch processing
+            oDataModel.setDeferredGroups(["saveGroup"]);
+
+            // Step 1: Call draftPrepare
+            var sPrepareActionPath = this._sDraftPath + "/OMTSrv.draftPrepare";
+            var oPreparePayload = {
+                SideEffectsQualifier: ""
+            };
+
+            oDataModel.create(sPrepareActionPath, oPreparePayload, {
+                groupId: "saveGroup",
+                success: function () {
+                    console.log("Draft prepared successfully");
+                }.bind(this),
+                error: function (oError) {
+                    console.error("Prepare error:", oError);
+                }.bind(this)
+            });
+
+            // Step 2: Call draftActivate
+            var sActivateActionPath = this._sDraftPath + "/OMTSrv.draftActivate";
+            var oActivatePayload = {};
+
+            oDataModel.create(sActivateActionPath, oActivatePayload, {
+                groupId: "saveGroup",
+                urlParameters: {
+                    "$select": "Accessibility_AccessID,CID,DraftMessages,Empid,Employer,FirstName,HasActiveEntity,HasDraftEntity,ID,IsActiveEntity,LastName,Location_LocID,NonSAP,Product,ProductGroup,RollOffDate,RollOffImpact_ROI,RollOnDate,SAP,SAPToday,ServiceGroup,Skill_SkillID,Staff_ReasonsRemarks,Staff_RollOffReasons,Staff_RollOffStatus,handoverKtBegun,isNewRecord,ktStarted",
+                    "$expand": "Accessibility($select=AccessID,Description),DraftAdministrativeData($select=DraftIsCreatedByMe,DraftUUID,InProcessByUser),Location($select=LocDesc,LocID)"
+                },
+                success: function (oData) {
+                    console.log("Draft activated successfully");
+                }.bind(this),
+                error: function (oError) {
+                    console.error("Activate error:", oError);
+                }.bind(this)
+            });
+
+            // Submit all changes in the batch
+            oDataModel.submitChanges({
+                groupId: "saveGroup",
+                success: function (oResponse) {
+                    if (oDialog) {
+                        oDialog.setBusy(false);
+                    }
+
+                    var bHasErrors = false;
+                    var sErrorMsg = "";
+
+                    if (oResponse.__batchResponses) {
+                        oResponse.__batchResponses.forEach(function (oResp) {
+                            if (oResp.__changeResponses) {
+                                oResp.__changeResponses.forEach(function (oChangeResp) {
+                                    if (oChangeResp.statusCode && parseInt(oChangeResp.statusCode) >= 400) {
+                                        bHasErrors = true;
+                                        sErrorMsg = this._extractErrorMessage(oChangeResp);
+                                    }
+                                }.bind(this));
+                            } else if (oResp.response && parseInt(oResp.response.statusCode) >= 400) {
+                                bHasErrors = true;
+                                sErrorMsg = this._extractErrorMessage(oResp.response);
+                            }
+                        }.bind(this));
+                    }
+
+                    if (!bHasErrors) {
+                        this._sDraftPath = null; // Clear draft path
+                        this._oDialogManager.closeDialog("editEmployeeDialog");
+                        MessageBox.success("Employee data updated successfully.");
+                        this._refreshSmartTable();
+                    } else {
+                        MessageBox.error("Failed to save changes: " + sErrorMsg);
+                    }
+                }.bind(this),
+                error: function (oError) {
+                    if (oDialog) {
+                        oDialog.setBusy(false);
+                    }
+                    var sErrorMsg = this._extractErrorMessage(oError);
+                    MessageBox.error("Failed to save changes: " + sErrorMsg);
+                }.bind(this)
+            });
+        },
+
+        onCancelEmployeeEdit: function () {
+            MessageBox.confirm("Are you sure you want to cancel? All unsaved changes will be lost.", {
+                title: "Confirm",
+                onClose: function (oAction) {
+                    if (oAction === MessageBox.Action.OK) {
+                        this._discardDraft();
+                    }
+                }.bind(this)
+            });
+        },
+
+        _discardDraft: function () {
+            if (!this._sDraftPath) {
+                this._oDialogManager.closeDialog("editEmployeeDialog");
+                return;
+            }
+
+            var oDataModel = this.getView().getModel();
+
+            oDataModel.remove(this._sDraftPath, {
+                success: function () {
+                    console.log("Draft discarded successfully");
+                    this._sDraftPath = null; // Clear draft path
+                    this._oDialogManager.closeDialog("editEmployeeDialog");
+                }.bind(this),
+                error: function (oError) {
+                    console.error("Failed to discard draft", oError);
+                    this._sDraftPath = null;
+                    this._oDialogManager.closeDialog("editEmployeeDialog");
+                }.bind(this)
+            });
+        },
+
+        _extractErrorMessage: function (oError) {
+            var sErrorMsg = "An error occurred.";
+            if (oError.responseText) {
+                try {
+                    var oErrorResponse = JSON.parse(oError.responseText);
+                    sErrorMsg = oErrorResponse.error.message.value ||
+                        oErrorResponse.error.message ||
+                        sErrorMsg;
+                } catch (e) {
+                    // Use default error message
+                }
+            } else if (oError.message) {
+                sErrorMsg = oError.message;
+            }
+            return sErrorMsg;
+        },
+
+        _refreshSmartTable: function () {
+            var oSmartTable = this.byId("smartTable");
+            if (oSmartTable) {
+                oSmartTable.rebindTable();
+            }
         },
 
         /* =========================================================== */
