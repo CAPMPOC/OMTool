@@ -166,15 +166,46 @@ sap.ui.define([
         /* Add Employee Event Handlers                                 */
         /* =========================================================== */
 
-        onAddEmployee: function () {
-            this.getView().setModel(models.createEmployeeModel(), "employee");
+        onAddEmployee: async function () {
+            var oViewModel = this.getView().getModel("viewModel");
 
-            this._oDialogManager.openDialog(
-                "addEmployeeDialog",
-                Constants.FRAGMENTS.ADD_EMPLOYEE
-            ).then(function () {
+            // Show busy indicator
+            oViewModel.setProperty("/busy", true);
+
+            try {
+                // Step 1: Create draft employee entry BEFORE opening dialog
+                var oModel = this.getView().getModel();
+                var oInitialPayload = EmployeeHelper.getInitialPayload();
+
+                console.log("Creating draft employee entry...");
+                var oCreatedData = await this._oEmployeeService.createDraftEmployee(oModel, oInitialPayload);
+
+                // Store the draft employee ID for later use
+                this._sDraftEmployeeId = oCreatedData.ID;
+
+                console.log("Draft employee created with ID:", this._sDraftEmployeeId);
+
+                if (oCreatedData.RollOnDate) {
+                    oCreatedData.rollOnDate = EmployeeHelper.formatDate(oCreatedData.RollOnDate);
+                }
+
+                // Step 2: Initialize employee model with the created draft data
+                this.getView().setModel(models.createEmployeeModelWithData(oCreatedData), "employee");
+
+                // Step 3: Open the dialog
+                await this._oDialogManager.openDialog(
+                    "addEmployeeDialog",
+                    Constants.FRAGMENTS.ADD_EMPLOYEE
+                );
+
                 this._resetDialogFields();
-            }.bind(this));
+
+            } catch (error) {
+                console.error("Error creating draft employee:", error);
+                MessageBox.error("Failed to initialize employee creation: " + (error.message || "Unknown error"));
+            } finally {
+                oViewModel.setProperty("/busy", false);
+            }
         },
 
         onAddEmployeePress: async function () {
@@ -185,17 +216,33 @@ sap.ui.define([
                 return;
             }
 
+            // Check if we have a draft employee ID
+            if (!this._sDraftEmployeeId) {
+                MessageBox.error("No draft employee found. Please try again.");
+                return;
+            }
+
             this._oDialogManager.setDialogBusy("addEmployeeDialog", true);
 
             try {
+                // Update the employee data with the stored draft ID
+                oEmployeeData.ID = this._sDraftEmployeeId;
+
+                // Step 1: Update the draft with user-entered data
                 var oModel = this.getView().getModel();
-                await this._oEmployeeService.createEmployee(oModel, oEmployeeData);
+                await this._oEmployeeService.updateDraftEmployee(oModel, this._sDraftEmployeeId, oEmployeeData);
+
+                console.log("Draft employee updated with form data");
+
+                // Step 2: Prepare and activate draft
+                await this._oEmployeeService.prepareAndActivateDraft(this._sDraftEmployeeId);
 
                 this._oDialogManager.setDialogBusy("addEmployeeDialog", false);
 
                 MessageBox.success(Constants.MESSAGES.SAVE_SUCCESS, {
                     onClose: function () {
                         this._oDialogManager.closeDialog("addEmployeeDialog");
+                        this._cleanupDraftData();
                         this._refreshMainView();
                     }.bind(this)
                 });
@@ -214,11 +261,13 @@ sap.ui.define([
                     title: "Confirm Cancel",
                     onClose: function (sAction) {
                         if (sAction === MessageBox.Action.OK) {
+                            this._deleteDraftIfExists();
                             this._oDialogManager.closeDialog("addEmployeeDialog");
                         }
                     }.bind(this)
                 });
             } else {
+                this._deleteDraftIfExists();
                 this._oDialogManager.closeDialog("addEmployeeDialog");
             }
         },
@@ -558,6 +607,18 @@ sap.ui.define([
                 oEmployeeModel.setProperty("/location", sLocationID);
                 oEmployeeModel.setProperty("/locationDesc", sLocationText);
                 console.log("Employee Location updated - ID:", sLocationID, "Text:", sLocationText);
+            }
+        },
+
+        _cleanupDraftData: function () {
+            this._sDraftEmployeeId = null;
+        },
+
+        _deleteDraftIfExists: function () {
+            if (this._sDraftEmployeeId) {
+                // Optional: Call backend to delete the draft if needed
+                console.log("Cleaning up draft employee:", this._sDraftEmployeeId);
+                this._cleanupDraftData();
             }
         }
     });

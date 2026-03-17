@@ -174,7 +174,7 @@
                             valueFormat="yyyy-MM-dd"
                             displayFormat="MM/dd/yyyy"
                             width="100%"
-                            placeholder="mm/dd/yyyy" editable="false"/>
+                            placeholder="mm/dd/yyyy" editable="{employee>/isRollOffDateFilled}"/>
                     </VBox>
                 </HBox>
                 
@@ -280,7 +280,7 @@
                             text="New Employee" />
                         <Switch
                             id="switchRollOffStarted"
-                            state="true"  customTextOn="Yes" customTextOff="No" />
+                            state="{employee>/isNewRecord}"  customTextOn="Yes" customTextOff="No" />
                     </HBox>
                     
                     <HBox
@@ -294,7 +294,7 @@
                             text="Onboarding KT Begun" />
                         <Switch
                             id="switchHandoverKT"
-                            state="true"  customTextOn="Yes" customTextOff="No" />
+                            state="{employee>/ktStarted}"  customTextOn="Yes" customTextOff="No" />
                     </HBox>
                 </HBox>
                     

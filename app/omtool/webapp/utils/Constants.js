@@ -53,8 +53,8 @@ sap.ui.define([], function () {
                 NonSAP: 0,
                 SAPToday: "",
                 Skill_SkillID: "",
-                statusRollOffStarted: false,
-                statusHandoverKTBegun: false
+                ktStarted: true,
+                isNewRecord: true
             },
 
             REPORT_DATA: {
