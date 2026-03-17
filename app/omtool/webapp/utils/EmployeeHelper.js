@@ -5,6 +5,18 @@ sap.ui.define([
 
     var EmployeeHelper = {
         /**
+         * Get initial minimal payload for draft creation (before dialog opens)
+         * @returns {object} - Minimal payload for initial draft creation
+         */
+        getInitialPayload: function () {
+            return {
+                IsActiveEntity: false
+                // Only send minimal data needed to create the draft
+                // Other fields will be filled when user submits the form
+            };
+        },
+
+        /**
          * Prepare employee payload for backend
          * @param {object} oEmployeeData - Raw employee data from form
          * @returns {object} - Formatted payload for backend
@@ -21,14 +33,13 @@ sap.ui.define([
                 Product: this._trimString(oEmployeeData.Product) || "",
                 Accessibility_AccessID: this._trimString(oEmployeeData.Accessibility) || "",
                 Employer: this._trimString(oEmployeeData.Employer) || "",
-                RollOnDate: this.formatDate(oEmployeeData.rollOnDate),
-                RollOffDate: this.formatDate(oEmployeeData.rollOffDate),
-                SAP: this._parseInteger(oEmployeeData.SAP),           // ✅ Changed
-                NonSAP: this._parseInteger(oEmployeeData.NonSAP),     // ✅ Changed
-                SAPToday: this._parseInteger(oEmployeeData.SAPToday), // ✅ Changed
-                Skill_SkillID: this._trimString(oEmployeeData.Skill) || "",
-                Staff_RollOffStatus: oEmployeeData.statusRollOffStarted || false,
-                handoverKtBegun: oEmployeeData.statusHandoverKTBegun || false,
+                RollOnDate: oEmployeeData.rollOnDate,
+                SAP: this._parseInteger(oEmployeeData.SAP),
+                NonSAP: this._parseInteger(oEmployeeData.NonSAP),
+                SAPToday: this._parseInteger(oEmployeeData.SAPToday),
+                Skill_SkillID: this._trimString(oEmployeeData.Skill_SkillID) || "",
+                ktStarted: oEmployeeData.ktStarted,
+                isNewRecord: oEmployeeData.isNewRecord,
                 IsActiveEntity: false
             };
         },
@@ -40,18 +51,15 @@ sap.ui.define([
          * @returns {number|null} - Parsed integer or null if invalid
          */
         _parseInteger: function (vValue) {
-            // Handle null/undefined
             if (vValue === null || vValue === undefined || vValue === "") {
-                return null; // ✅ Return null instead of 0 for empty values
+                return null;
             }
 
-            // Parse the value
             var iParsed = parseInt(vValue, 10);
 
-            // Check if parsing was successful
             if (isNaN(iParsed)) {
                 console.warn("Invalid integer value:", vValue);
-                return null; // ✅ Return null for invalid values
+                return null;
             }
 
             return iParsed;
