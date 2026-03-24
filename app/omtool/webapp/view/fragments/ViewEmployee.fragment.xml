@@ -47,7 +47,7 @@
                 <VBox width="48%" class="sapUiSmallMarginEnd">
                     <Label text="Location"/>
                     <Input
-                        value="{viewEmployee>/Location_LocID}"
+                        value="{viewEmployee>/LocationVHData/LocDesc}"
                         width="100%"
                         placeholder="" enabled="false"/>
                 </VBox>

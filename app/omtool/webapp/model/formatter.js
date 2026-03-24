@@ -1,11 +1,13 @@
-sap.ui.define([], function () {
+sap.ui.define([
+    "../utils/EmployeeHelper"
+], function (EmployeeHelper) {
     "use strict";
 
     return {
 
-        // formatBoolean: function (bValue) {
-        //     return bValue ? "Yes" : "No";
-        // }
+        formatDate: function(sDate) {
+            return EmployeeHelper.formatDate(sDate);
+        }
 
     };
 }, /* bExport= */ true);

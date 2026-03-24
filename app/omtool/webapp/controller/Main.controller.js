@@ -163,6 +163,70 @@ sap.ui.define([
         },
 
         /* =========================================================== */
+        /* Edit Employee Location ValueHelp Handlers                   */
+        /* =========================================================== */
+
+        onEditEmployeeLocationSuggest: function (oEvent) {
+            this._oLocationHelper.onSuggest(oEvent);
+        },
+
+        onEditEmployeeLocationSuggestionSelected: function (oEvent) {
+            this._oLocationHelper.onSuggestionSelected(oEvent, this._updateEditEmployeeLocation.bind(this));
+        },
+
+        onEditEmployeeLocationValueHelp: function () {
+            this._oDialogManager.openDialog(
+                "editEmployeeLocationDialog",
+                Constants.FRAGMENTS.EDIT_EMPLOYEE_LOCATION_VH
+            );
+        },
+
+        onEditEmployeeLocationSearch: function (oEvent) {
+            this._oLocationHelper.onSearch(oEvent);
+        },
+
+        onEditEmployeeLocationDialogConfirm: function (oEvent) {
+            this._oLocationHelper.onDialogConfirm(oEvent, function (sLocationID, sLocationText) {
+                this._updateEditEmployeeLocation(sLocationID, sLocationText);
+            }.bind(this));
+        },
+
+        onEditEmployeeLocationDialogCancel: function (oEvent) {
+            this._oLocationHelper.onDialogCancel(oEvent);
+        },
+
+        onEditEmployeeLocationChange: function (oEvent) {
+            var sValue = oEvent.getParameter("value");
+
+            if (!sValue || sValue.trim() === "") {
+                // Clear location when input is cleared
+                this._updateEditEmployeeLocation("", "");
+            }
+        },
+
+        _updateEditEmployeeLocation: function (sLocationID, sLocationText) {
+            var oEditModel = this.getView().getModel("editEmployee");
+
+            if (oEditModel) {
+                // Update the model
+                oEditModel.setProperty("/Location_LocID", sLocationID);
+                oEditModel.setProperty("/Location/LocDesc", sLocationText);
+                oEditModel.setProperty("/Location/LocID", sLocationID);
+
+                // Update the input field value
+                var oLocationInput = this.byId("inputEditEmployeeLocation");
+                if (oLocationInput) {
+                    oLocationInput.setValue(sLocationText);
+                }
+
+                // Immediately persist to draft
+                this._updateDraftField("Location_LocID", sLocationID);
+
+                console.log("Edit Employee Location updated - ID:", sLocationID, "Text:", sLocationText);
+            }
+        },
+
+        /* =========================================================== */
         /* Add Employee Event Handlers                                 */
         /* =========================================================== */
 
@@ -276,7 +340,7 @@ sap.ui.define([
         /* View Employee Event Handlers                                */
         /* =========================================================== */
 
-        onViewEmployee: function (oEvent) {
+        onViewEmployee:async function (oEvent) {
             var oContext = oEvent.getSource().getBindingContext();
 
             if (!oContext) {
@@ -286,9 +350,14 @@ sap.ui.define([
 
             var oEmployeeData = oContext.getObject();
             var oModel = models.createEmployeeModelWithData(oEmployeeData);
-
+            
             // Set model on view first
             this.getView().setModel(oModel, "viewEmployee");
+            
+            if(oEmployeeData.Location !== null){
+                var LocationVHData = await this.oODataService.readEntitySet(`/LocationVH('${oEmployeeData.Location_LocID}')`)
+                this.getView().getModel("viewEmployee").setProperty("/LocationVHData", LocationVHData)
+            }
 
             this._oDialogManager.openDialog(
                 "viewEmployeeDialog",

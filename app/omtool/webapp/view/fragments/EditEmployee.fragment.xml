@@ -69,18 +69,20 @@
                         <Label id="lbleditLocation" text="Employee Location" required="true"/>
                         <Input 
                             id="inputEditEmployeeLocation" 
-                            value="{editEmployee>/Location_LocID}"
+                            value="{editEmployee>/Location/LocDesc}"
                             width="100%"
                             placeholder="Select Location"
                             showClearIcon="true"
                             showValueHelp="true"
-                            valueHelpRequest=".onEmployeeLocationValueHelp"
+                            valueHelpRequest=".onEditEmployeeLocationValueHelp"
                             showSuggestion="true"
                             suggestionItems="{path: '/LocationVH'}"
-                            suggest=".onEmployeeLocationSuggest"
-                            suggestionItemSelected=".onEmployeeLocationSuggestionSelected"
-                            change=".onEmployeeLocationChangeWithUpdate">
-                            
+                            suggest=".onEditEmployeeLocationSuggest"
+                            suggestionItemSelected=".onEditEmployeeLocationSuggestionSelected"
+                            change=".onEditEmployeeLocationChange">
+                            <customData>
+                                <core:CustomData key="fieldName" value="Location_LocID"/>
+                            </customData>
                             <suggestionItems>
                                 <core:Item 
                                     key="{LocID}" 
@@ -196,12 +198,12 @@
                         <Label text="Roll-On Date" required="true"/>
                         <DatePicker 
                             id="editRollOnDate"
-                            value="{editEmployee>/RollOnDate}"
+                            value="{path: 'editEmployee>/RollOnDate', formatter:'.formatter.formatDate'}"
                             valueFormat="yyyy-MM-dd"
                             displayFormat="MM/dd/yyyy"
                             width="100%"
                             placeholder="mm/dd/yyyy"
-                            change=".onRollOnDateChangeWithUpdate">
+                            change=".onEmployeeFieldChange">
                             <customData>
                                 <core:CustomData key="fieldName" value="RollOnDate"/>
                             </customData>
@@ -303,7 +305,7 @@
                             <Text text="New Employee" />
                             <Switch
                                 id="editNewEmployeeSwitch"
-                                state="{editEmployee>/isNewEmployee}"
+                                state="{editEmployee>/isNewRecord}"
                                 customTextOn="Yes" 
                                 customTextOff="No"
                                 change=".onEmployeeFieldChange">
@@ -320,7 +322,7 @@
                             <Text text="Onboarding KT Begun" />
                             <Switch 
                                 id="editOnboardingSwitch"
-                                state="{editEmployee>/onboardingKTBegun}"
+                                state="{editEmployee>/ktStarted}"
                                 customTextOn="Yes" 
                                 customTextOff="No"
                                 change=".onEmployeeFieldChange">

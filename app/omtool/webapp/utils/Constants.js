@@ -14,7 +14,8 @@ sap.ui.define([], function () {
             ADD_EMPLOYEE: "com.sap.omtool.omtool.view.fragments.DialogFragment",
             VIEW_EMPLOYEE: "com.sap.omtool.omtool.view.fragments.ViewEmployee",
             EDIT_EMPLOYEE: "com.sap.omtool.omtool.view.fragments.EditEmployee",
-            EMPLOYEE_LOCATION_VH: "com.sap.omtool.omtool.view.fragments.EmployeeLocationValueHelp"
+            EMPLOYEE_LOCATION_VH: "com.sap.omtool.omtool.view.fragments.EmployeeLocationValueHelp",
+            EDIT_EMPLOYEE_LOCATION_VH: "com.sap.omtool.omtool.view.fragments.EditEmployeeLocation"
         },
 
         // Messages
