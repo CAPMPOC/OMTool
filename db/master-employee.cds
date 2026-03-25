@@ -19,7 +19,7 @@ entity EmployeeHeader : cuid {
             NonSAP               : Integer default 0;
             SAP                  : Integer default 0;
     virtual SAPToday             : Integer;
-            RollOffImpact        : Association to RollofImpactVH;
+            RollOffImpact        : Association to RollOffImpactVH;
             Skill                : Association to SkillVH;
             Staff_RollOffReasons : String(100);
             Staff_ReasonsRemarks : String(50);
@@ -47,7 +47,7 @@ entity LocationVH {
         LocDesc : String(100) @Common.Label: 'Location';
 }
 
-entity RollofImpactVH {
+entity RollOffImpactVH {
     key ROI : String(50) @Common.Label: 'Roll-Off Impact'
 }
 

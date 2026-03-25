@@ -201,7 +201,7 @@
                         width="50%"
                         class="sapUiSmallMarginTop">
                         <Text text="Onboarding KT Begun" />
-                        <Switch state="{viewEmployee>/handoverKtBegun}"  customTextOn="Yes" customTextOff="No" enabled="false"/>
+                        <Switch state="{viewEmployee>/ktStarted}"  customTextOn="Yes" customTextOff="No" enabled="false"/>
                     </HBox>
                 </HBox>
                     
