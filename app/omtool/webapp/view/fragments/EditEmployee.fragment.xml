@@ -218,14 +218,80 @@
                             displayFormat="MM/dd/yyyy"
                             width="100%"
                             placeholder="mm/dd/yyyy"
-                            minDate="{editEmployee>/rollOnDate}"
-                            change=".onEmployeeFieldChange">
+                            minDate="{editEmployee>/RollOffDate}"
+                            change=".onEmployeeFieldChange"
+                            enabled="false">
                             <customData>
                                 <core:CustomData key="fieldName" value="RollOffDate"/>
                             </customData>
                         </DatePicker>
                     </VBox>
                 </HBox>
+                
+
+                <HBox class="sapUiSmallMarginTop">
+                <VBox width="48%" class="sapUiSmallMarginEnd">
+                        <Label text="Impact of RollOff"/>
+                        <ComboBox
+                            id="ImpactEditEmployee"
+                            width="240px"
+                            class="sapUiTinyMarginEnd"
+                            showClearIcon="true"
+                            selectedKey="{editEmployee>/RollOffImpact_ROI}"
+                            selectionChange=".onEmployeeFieldChange"
+                            items="{path: '/RollOffImpactVH'}"
+                            enabled="false">
+                            <customData>
+                                <core:CustomData key="fieldName" value="RollOffImpact_ROI"/>
+                            </customData>
+                            <core:Item key="{ROI}" text="{ROI}" />
+                        </ComboBox>
+                    </VBox>  
+                    <VBox width="48%" class="sapUiSmallMarginEnd">
+                        <Label text="RollOff Reason"/>
+                        <Input
+                            value="{editEmployee>/Staff_RollOffReasons}"
+                            width="100%"
+                            placeholder="Enter RollOffReasons"
+                            change=".onEmployeeFieldChange"
+                             enabled="false">
+                            <customData>
+                                <core:CustomData key="fieldName" value="Staff_RollOffReasons"/>
+                            </customData>
+                        </Input>
+                    </VBox> 
+                    </HBox>
+
+                    <VBox class="sapUiSmallMarginEnd">
+                        <Label text="Reasons/Remarks"/>
+                        <Input
+                            value="{editEmployee>/Staff_ReasonsRemarks}"
+                            width="98%"
+                            placeholder="Enter ReasonsRemarks"
+                            change=".onEmployeeFieldChange"
+                             enabled="false">
+                            <customData>
+                                <core:CustomData key="fieldName" value="Staff_ReasonsRemarks"/>
+                            </customData>
+                        </Input>
+                    </VBox> 
+
+                    <HBox justifyContent="Start"
+                            alignItems="Center"
+                            width="50%"
+                            class="sapUiSmallMarginTop">
+                            <Text text="Handover KT Begun?" />
+                            <Switch 
+                                id="editHandoverSwitch"
+                                state="false"
+                                customTextOn="Yes" 
+                                customTextOff="No"
+                                change=".onEmployeeFieldChange">
+                                <customData>
+                                    <core:CustomData key="fieldName" value="handoverKtBegun"/>
+                                </customData>
+                            </Switch>
+                        </HBox>
                 
                 <!-- Experience Section -->
                 <Title text="Experience"
@@ -303,7 +369,7 @@
                             <Text text="New Employee" />
                             <Switch
                                 id="editNewEmployeeSwitch"
-                                state="{editEmployee>/isNewEmployee}"
+                                state="{editEmployee>/isNewRecord}"
                                 customTextOn="Yes" 
                                 customTextOff="No"
                                 change=".onEmployeeFieldChange">
@@ -320,12 +386,12 @@
                             <Text text="Onboarding KT Begun" />
                             <Switch 
                                 id="editOnboardingSwitch"
-                                state="{editEmployee>/onboardingKTBegun}"
+                                state="{editEmployee>/ktStarted}"
                                 customTextOn="Yes" 
                                 customTextOff="No"
                                 change=".onEmployeeFieldChange">
                                 <customData>
-                                    <core:CustomData key="fieldName" value="handoverKtBegun"/>
+                                    <core:CustomData key="fieldName" value="ktStarted"/>
                                 </customData>
                             </Switch>
                         </HBox>

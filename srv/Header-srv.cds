@@ -6,7 +6,7 @@ service OMTSrv {
 
         entity AccessibilityVH as projection on empheader.AccessibilityVH;
         entity LocationVH      as projection on empheader.LocationVH;
-        entity RollOffImpactVH as projection on empheader.RollofImpactVH;
+        entity RollOffImpactVH as projection on empheader.RollOffImpactVH;
         entity SkillVH         as projection on empheader.SkillVH;
 }
 
