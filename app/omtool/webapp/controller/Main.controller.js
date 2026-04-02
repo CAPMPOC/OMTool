@@ -340,7 +340,7 @@ sap.ui.define([
         /* View Employee Event Handlers                                */
         /* =========================================================== */
 
-        onViewEmployee:async function (oEvent) {
+        onViewEmployee: async function (oEvent) {
             var oContext = oEvent.getSource().getBindingContext();
 
             if (!oContext) {
@@ -350,11 +350,11 @@ sap.ui.define([
 
             var oEmployeeData = oContext.getObject();
             var oModel = models.createEmployeeModelWithData(oEmployeeData);
-            
+
             // Set model on view first
             this.getView().setModel(oModel, "viewEmployee");
-            
-            if(oEmployeeData.Location !== null){
+
+            if (oEmployeeData.Location !== null) {
                 var LocationVHData = await this.oODataService.readEntitySet(`/LocationVH('${oEmployeeData.Location_LocID}')`)
                 this.getView().getModel("viewEmployee").setProperty("/LocationVHData", LocationVHData)
             }
@@ -453,6 +453,48 @@ sap.ui.define([
             var vNewValue = oSource.getValue ? oSource.getValue() :
                 oSource.getSelectedKey ? oSource.getSelectedKey() :
                     oSource.getState ? oSource.getState() : null;
+
+
+            // Fields to toggle based on ktStarted
+            var aToggleFields = [
+                "RollOffImpact_ROIField",
+                "Staff_ReasonsRemarksField",
+                "Staff_RollOffReasonsField",
+                "RollOffDateField",
+                "handoverKtBegunField",
+                "Staff_RollOffStatusField"
+            ];
+
+            // Get model once for performance
+            var oModel = this.getModel("editEmployee");
+
+            if (sFieldName === "ktStarted") {
+                var bToggleValue = !vNewValue;   // false → true, true → false
+
+                aToggleFields.forEach(function (sPath) {
+                    oModel.setProperty("/" + sPath, bToggleValue);
+                });
+            }
+
+
+            if (sFieldName === "RollOffDate") {
+
+                // Fields that should become mandatory once RollOffDate is filled
+                var aMandatoryFields = [
+                    "Staff_ReasonsRemarksFieldRequired",
+                    "RollOffImpact_ROIFieldRequired",
+                    "Staff_RollOffReasonsFieldRequired",
+                    "handoverKtBegunFieldRequired",
+                    "Staff_RollOffStatusFieldRequired"
+                ];
+
+                var bIsFilled = !!vNewValue; // Not null → true
+
+                aMandatoryFields.forEach(function (sPath) {
+                    oModel.setProperty("/" + sPath, bIsFilled);
+                });
+            }
+
 
             // Update the draft immediately
             this._updateDraftField(sFieldName, vNewValue);

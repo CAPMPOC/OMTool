@@ -54,8 +54,8 @@ sap.ui.define([], function () {
                 NonSAP: 0,
                 SAPToday: "",
                 Skill_SkillID: "",
-                ktStarted: true,
-                isNewRecord: true
+                ktStarted: false,
+                isNewRecord: false
             },
 
             REPORT_DATA: {

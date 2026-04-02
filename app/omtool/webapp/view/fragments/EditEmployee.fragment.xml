@@ -215,14 +215,14 @@
                         <Label text="Roll-off Date"/>
                         <DatePicker 
                             id="editRollOffDate"
-                            value="{editEmployee>/RollOffDate}"
+                            dateValue="{editEmployee>/RollOffDate}"
                             valueFormat="yyyy-MM-dd"
                             displayFormat="MM/dd/yyyy"
                             width="100%"
                             placeholder="mm/dd/yyyy"
                             minDate="{editEmployee>/RollOffDate}"
                             change=".onEmployeeFieldChange"
-                            enabled="false">
+                            enabled="{editEmployee>/RollOffDateField}">
                             <customData>
                                 <core:CustomData key="fieldName" value="RollOffDate"/>
                             </customData>
@@ -233,7 +233,7 @@
 
                 <HBox class="sapUiSmallMarginTop">
                 <VBox width="48%" class="sapUiSmallMarginEnd">
-                        <Label text="Impact of RollOff"/>
+                        <Label text="Impact of RollOff" required="{editEmployee>/RollOffImpact_ROIFieldRequired}" />
                         <ComboBox
                             id="ImpactEditEmployee"
                             width="240px"
@@ -242,7 +242,8 @@
                             selectedKey="{editEmployee>/RollOffImpact_ROI}"
                             selectionChange=".onEmployeeFieldChange"
                             items="{path: '/RollOffImpactVH'}"
-                            enabled="false">
+                            enabled="{editEmployee>/RollOffImpact_ROIField}"
+                            required="{editEmployee>/RollOffImpact_ROIFieldRequired}">
                             <customData>
                                 <core:CustomData key="fieldName" value="RollOffImpact_ROI"/>
                             </customData>
@@ -250,13 +251,15 @@
                         </ComboBox>
                     </VBox>  
                     <VBox width="48%" class="sapUiSmallMarginEnd">
-                        <Label text="RollOff Reason"/>
+                        <Label text="RollOff Reason" required="{editEmployee>/Staff_RollOffReasonsFieldRequired}" />
                         <Input
+                            id="editRollOffReasons"
                             value="{editEmployee>/Staff_RollOffReasons}"
                             width="100%"
                             placeholder="Enter RollOffReasons"
                             change=".onEmployeeFieldChange"
-                             enabled="false">
+                            enabled="{editEmployee>/Staff_RollOffReasonsField}"
+                            required="{editEmployee>/Staff_RollOffReasonsFieldRequired}">
                             <customData>
                                 <core:CustomData key="fieldName" value="Staff_RollOffReasons"/>
                             </customData>
@@ -265,35 +268,59 @@
                     </HBox>
 
                     <VBox class="sapUiSmallMarginEnd">
-                        <Label text="Reasons/Remarks"/>
+                        <Label text="Reasons/Remarks" required="{editEmployee>/Staff_ReasonsRemarksFieldRequired}" />
                         <Input
+                            id="editReasonsRemarks"
                             value="{editEmployee>/Staff_ReasonsRemarks}"
                             width="98%"
                             placeholder="Enter ReasonsRemarks"
                             change=".onEmployeeFieldChange"
-                             enabled="false">
+                            enabled="{editEmployee>/Staff_ReasonsRemarksField}"
+                            required="{editEmployee>/Staff_ReasonsRemarksFieldRequired}">
                             <customData>
                                 <core:CustomData key="fieldName" value="Staff_ReasonsRemarks"/>
                             </customData>
                         </Input>
                     </VBox> 
 
-                    <HBox justifyContent="Start"
-                            alignItems="Center"
-                            width="50%"
-                            class="sapUiSmallMarginTop">
-                            <Text text="Handover KT Begun?" />
-                            <Switch 
-                                id="editHandoverSwitch"
-                                state="false"
-                                customTextOn="Yes" 
-                                customTextOff="No"
-                                change=".onEmployeeFieldChange">
-                                <customData>
-                                    <core:CustomData key="fieldName" value="handoverKtBegun"/>
-                                </customData>
-                            </Switch>
+                    <VBox class="sapUiMediumMarginTop">
+                        <HBox >
+                            <HBox justifyContent="Start"
+                                alignItems="Center"
+                                width="50%"
+                                class="sapUiSmallMarginTop">
+                                    <Label text="Handover KT Begun" required="{editEmployee>/handoverKtBegunFieldRequired}" />
+                                    <Switch 
+                                        id="editHandoverSwitch"
+                                        state="{editEmployee>/handoverKtBegun}"
+                                        customTextOn="Yes" 
+                                        customTextOff="No"
+                                        change=".onEmployeeFieldChange"
+                                        enabled="{editEmployee>/handoverKtBegunField}" >
+                                        <customData>
+                                            <core:CustomData key="fieldName" value="handoverKtBegun"/>
+                                        </customData>
+                                    </Switch>
+                            </HBox>
+                            <HBox justifyContent="Start"
+                                    alignItems="Center"
+                                    width="50%"
+                                    class="sapUiSmallMarginTop">
+                                    <Label text="Employee Roll-off Status" required="{editEmployee>/Staff_RollOffStatusFieldRequired}" />
+                                    <Switch 
+                                        id="editRollOffStatus"
+                                        state="{editEmployee>/Staff_RollOffStatus}"
+                                        customTextOn="Yes" 
+                                        customTextOff="No"
+                                        change=".onEmployeeFieldChange"
+                                        enabled="{editEmployee>/Staff_RollOffStatusField}">
+                                        <customData>
+                                            <core:CustomData key="fieldName" value="Staff_RollOffStatus"/>
+                                        </customData>
+                                    </Switch>
+                            </HBox>
                         </HBox>
+                    </VBox>
                 
                 <!-- Experience Section -->
                 <Title text="Experience"

@@ -67,7 +67,7 @@
                 demandPopin="true"
                 showFullScreenButton="true"
                 beforeRebindTable="onBeforeRebindTable"
-                requestAtLeastFields="LocDesc"
+                requestAtLeastFields="LocDesc,RollOnDate"
                 class="sapUiResponsiveContentPadding">
                 
                 <smartTable:customToolbar>

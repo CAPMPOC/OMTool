@@ -61,12 +61,26 @@ sap.ui.define([
          * @returns {sap.ui.model.json.JSONModel} The employee model with data.
          */
         createEmployeeModelWithData: function (oEmployeeData) {
-            // Ensure we have valid data
-            var oData = oEmployeeData || {};
+            // // Ensure we have valid data
+            var oDefaults = {
+                Staff_ReasonsRemarksField: false,
+                RollOffImpact_ROIField: false,
+                Staff_RollOffReasonsField: false,
+                RollOffDateField: false,
+                handoverKtBegunField: false,
+                Staff_RollOffStatusField: false,
+                Staff_ReasonsRemarksFieldRequired: false,
+                RollOffImpact_ROIFieldRequired: false,
+                Staff_RollOffReasonsFieldRequired: false,
+                handoverKtBegunFieldRequired: false,
+                Staff_RollOffStatusFieldRequired: false
+            };
 
-            // Create and return the JSONModel
-            var oModel = new JSONModel(oData);
-            return oModel;
+            // Merge defaults with incoming data
+            var oData = Object.assign({}, oDefaults, oEmployeeData);
+
+            return new JSONModel(oData);
+
         },
 
         /**
